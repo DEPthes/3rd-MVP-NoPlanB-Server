@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://growmedb.cve82euwcy10.ap-northeast-2.rds.amazonaws.com:3306/growmedb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: admin
+    password: 'depgrow!'
+  jpa:
+    hibernate:
+      ddl-auto: create  # 프로덕션 환경에서는 'none' 또는 'validate'로 변경
+    open-in-view: true
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
