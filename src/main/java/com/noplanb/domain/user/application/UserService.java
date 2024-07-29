@@ -1,4 +1,4 @@
-package com.noplanb.domain.item.service;
+package com.noplanb.domain.user.application;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -7,5 +7,5 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ItemService {
+public class UserService {
 }
