@@ -3,7 +3,7 @@ name: Deploy to Amazon EC2
 on:
   push:
     branches:
-      - develop #브랜치명
+      - testbaepo #브랜치명
 
 # 본인이 설정한 값을 여기서 채워넣는다.
 env:
