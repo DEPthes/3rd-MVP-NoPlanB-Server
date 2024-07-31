@@ -69,6 +69,8 @@ jobs:
       # ignore 값들 가져오기
       - name: make application.yml
         run: |
-          touch ./src/main/resources/application.yml
-          echo "${{ secrets.APPLICATION }}" > /src/main/resources/application.yml
+          mkdir -p ./src/main/resources
+          cd ./src/main/resources
+          touch ./application.yml
+          echo "${{ secrets.APPLICATION }}" > ./application.yml
           
