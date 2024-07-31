@@ -70,7 +70,6 @@ jobs:
       - name: make application.yml
         run: |
           mkdir -p ./src/main/resources
-          cd ./src/main/resources
           touch ./application.yml
-          echo "${{ secrets.APPLICATION }}" > ./application.yml
+          echo "${{ secrets.APPLICATION }}" | base64 --decode > ./src/main/resources/application.yml
           
