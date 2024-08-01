@@ -63,7 +63,8 @@ jobs:
 
       - name: Generate application.yml
         run: |
-          mkdir -p src/main/resources
-          touch src/main/resources/application.yml
-          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application.yml
-          cat src/main/resources/application.yml  # 디버깅용, 생성된 파일 내용 확인
+          mkdir -p ./src/main/resources
+          cd ./src/main/resources
+          touch ./application.yml
+          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > ./application.yml
+          cat ./application.yml  # 디버깅용, 생성된 파일 내용 확인
