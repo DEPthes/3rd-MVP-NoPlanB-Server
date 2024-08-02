@@ -29,11 +29,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: clean build -x test
           
       - name: Generate application.yml
         run: |
@@ -42,6 +37,11 @@ jobs:
           touch ./application.yml
           echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > ./application.yml
           cat ./application.yml  # 디버깅용, 생성된 파일 내용 확인
+
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v3
+        with:
+          arguments: clean build -x test
 
 
       # - name: Clean and Build with Gradle
