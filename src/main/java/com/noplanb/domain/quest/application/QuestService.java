@@ -6,6 +6,7 @@ import com.noplanb.domain.quest.domain.Quest;
 import com.noplanb.domain.quest.dto.req.CreateQuestReq;
 import com.noplanb.domain.quest.repository.QuestRepository;
 import com.noplanb.global.payload.ApiResponse;
+import com.noplanb.global.payload.Message;
 import com.noplanb.global.payload.exception.CharacterNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ public class QuestService {
 
         ApiResponse apiResponse = ApiResponse.builder()
                 .check(true)
-                .information("퀘스트를 만들었습니다.")
+                .information((Message.builder().message("퀘스트를 만들었습니다.").build()))
                 .build();
 
         return ResponseEntity.ok(apiResponse);
