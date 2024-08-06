@@ -42,4 +42,5 @@ out/
 .DS_Store
 
 ### ELSE ###
-application.yml
+application
+application-s3.yml
