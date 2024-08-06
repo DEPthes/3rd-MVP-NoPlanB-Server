@@ -36,7 +36,8 @@ jobs:
           cd ./src/main/resources
           touch ./application.yml
           echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > ./application.yml
-          cat ./application.yml  # 디버깅용, 생성된 파일 내용 확인
+          touch ./application-s3.yml
+          echo "${{ secrets.APPLICATION_S3_YML }}" | base64 --decode > ./application-s3.yml
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v3
