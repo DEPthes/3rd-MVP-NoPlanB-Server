@@ -43,3 +43,4 @@ out/
 
 ### ELSE ###
 application.yml
+application-s3.yml

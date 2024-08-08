@@ -3,15 +3,15 @@ package com.noplanb.domain.quest.domain;
 import com.noplanb.domain.character.domain.Character;
 import com.noplanb.domain.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
 public class Quest extends BaseEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
