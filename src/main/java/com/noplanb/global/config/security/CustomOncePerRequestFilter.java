@@ -1,12 +1,15 @@
 package com.noplanb.global.config.security;
 
-import com.noplanb.global.config.security.token.UserPrincipal;
+import com.noplanb.global.config.security.util.JwtTokenUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -17,17 +20,23 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.Key;
 
 @Component
 public class CustomOncePerRequestFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userDetailsService;
+    private final JwtParser jwtParser;
+    private JwtTokenUtil jwtTokenUtil;
 
     @Value("${app.auth.tokenSecret}")
     private String jwtSecret;
 
-    public CustomOncePerRequestFilter(UserDetailsService userDetailsService) {
+    public CustomOncePerRequestFilter(UserDetailsService userDetailsService, @Value("${app.auth.tokenSecret}") String jwtSecret) {
         this.userDetailsService = userDetailsService;
+        this.jwtSecret = jwtSecret;
+        Key signingKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        this.jwtParser = Jwts.parserBuilder().setSigningKey(signingKey).build(); // Initialize JwtParser once
     }
 
     @Override
@@ -35,14 +44,17 @@ public class CustomOncePerRequestFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String jwt = getJwtFromRequest(request);
 
-        if (jwt != null && validateToken(jwt)) {
-            String username = getUsernameFromJWT(jwt);
+        if (jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            String username = jwtTokenUtil.getUsernameFromJWT(jwt);
 
-            UserPrincipal userDetails = (UserPrincipal) userDetailsService.loadUserByUsername(username);
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (username != null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                if (jwtTokenUtil.validateToken(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            }
         }
 
         filterChain.doFilter(request, response);
@@ -58,22 +70,18 @@ public class CustomOncePerRequestFilter extends OncePerRequestFilter {
 
     private boolean validateToken(String authToken) {
         try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
+            jwtParser.parseClaimsJws(authToken);
             return true;
         } catch (SignatureException ex) {
-            logger.error("Invalid JWT signature");
+            logger.error("Invalid JWT signature", ex);
         } catch (Exception e) {
-            logger.error("Invalid JWT token");
+            logger.error("Invalid JWT token", e);
         }
         return false;
     }
 
     private String getUsernameFromJWT(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(jwtSecret)
-                .parseClaimsJws(token)
-                .getBody();
-
+        Claims claims = jwtParser.parseClaimsJws(token).getBody();
         return claims.getSubject();
     }
 }

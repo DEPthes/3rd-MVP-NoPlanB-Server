@@ -16,7 +16,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    private Long userId;
+    private Long id;
     private String userName;
     private String email;
     private String password;
@@ -24,22 +24,20 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Provider provider;
 
-    private String providerId;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "character_id", unique = true)
-    private Character character;
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "character_id", unique = true)
+//    private Character character;
 
     @Builder
-    public User(String userName, String email, String password, Provider provider, String providerId, Role role) {
+    public User(String userName, String email, String password, Provider provider, Role role) {
         this.userName = userName;
         this.email = email;
         this.password = password;
         this.provider = provider;
-        this.providerId = providerId;
         this.role = role;
     }
 }

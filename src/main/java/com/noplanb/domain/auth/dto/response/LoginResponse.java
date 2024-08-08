@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class TokenMapping {
-    private String email;
+public class LoginResponse {
     private String accessToken;
     private String refreshToken;
 }
