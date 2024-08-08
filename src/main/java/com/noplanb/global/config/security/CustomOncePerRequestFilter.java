@@ -1,11 +1,11 @@
 package com.noplanb.global.config.security;
 
 import com.noplanb.global.config.security.util.JwtTokenUtil;
-import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,12 +21,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Key;
+import java.util.HashMap;
 
 @Component
 public class CustomOncePerRequestFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userDetailsService;
     private final JwtParser jwtParser;
+
+    @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
     @Value("${app.auth.tokenSecret}")
@@ -45,7 +48,17 @@ public class CustomOncePerRequestFilter extends OncePerRequestFilter {
         String jwt = getJwtFromRequest(request);
 
         if (jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            String username = jwtTokenUtil.getUsernameFromJWT(jwt);
+            String username = null;
+            try {
+                username = jwtTokenUtil.getUsernameFromJWT(jwt);
+            } catch (ExpiredJwtException ex) {
+                String refreshToken = getRefreshTokenFromRequest(request);
+                if (refreshToken != null && jwtTokenUtil.validateRefreshToken(refreshToken)) {
+                    String newAccessToken = jwtTokenUtil.generateToken(new HashMap<>(), jwtTokenUtil.getUsernameFromRefreshToken(refreshToken));
+                    response.setHeader("Authorization", "Bearer " + newAccessToken);
+                    username = jwtTokenUtil.getUsernameFromJWT(newAccessToken);
+                }
+            }
 
             if (username != null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -68,20 +81,11 @@ public class CustomOncePerRequestFilter extends OncePerRequestFilter {
         return null;
     }
 
-    private boolean validateToken(String authToken) {
-        try {
-            jwtParser.parseClaimsJws(authToken);
-            return true;
-        } catch (SignatureException ex) {
-            logger.error("Invalid JWT signature", ex);
-        } catch (Exception e) {
-            logger.error("Invalid JWT token", e);
+    private String getRefreshTokenFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Refresh-Token");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
         }
-        return false;
-    }
-
-    private String getUsernameFromJWT(String token) {
-        Claims claims = jwtParser.parseClaimsJws(token).getBody();
-        return claims.getSubject();
+        return null;
     }
 }

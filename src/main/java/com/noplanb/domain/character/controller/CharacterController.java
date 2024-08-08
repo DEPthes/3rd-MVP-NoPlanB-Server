@@ -1,6 +1,7 @@
 package com.noplanb.domain.character.controller;
 
 import com.noplanb.domain.character.application.CharacterService;
+import com.noplanb.domain.character.dto.request.UpdateNameReq;
 import com.noplanb.domain.character.dto.response.MyCharacterInfoRes;
 import com.noplanb.domain.character.dto.response.MyCharaterListRes;
 import com.noplanb.global.config.security.token.CurrentUser;
@@ -34,7 +35,9 @@ public class CharacterController {
             @ApiResponse(responseCode = "400", description = "캐릭터 조회 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
     })
     @GetMapping("/")
-    public ResponseEntity<?> getMyCharacter(@Parameter @CurrentUser UserPrincipal userPrincipal){
+    public ResponseEntity<?> getMyCharacter(
+            @Parameter @CurrentUser UserPrincipal userPrincipal
+    ){
         return characterService.getMyCharacter(userPrincipal);
     }
 
@@ -43,11 +46,20 @@ public class CharacterController {
             @ApiResponse(responseCode = "200", description = "캐릭터 정보 조회 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = MyCharacterInfoRes.class) ) } ),
             @ApiResponse(responseCode = "400", description = "캐릭터 정보 조회 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
     })
-    @GetMapping("/")
+    @GetMapping("/my")
     public ResponseEntity<?> getMyCharacterInfo(@Parameter @CurrentUser UserPrincipal userPrincipal){
         return characterService.getMyCharacterInfo(userPrincipal);
     }
 
+    @Operation(summary = "캐릭터와 이름 업데이터 API", description = "마이페이지에서 캐릭터 이름을 변경하는 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "캐릭터 이름 업데이트 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Message.class) ) } ),
+            @ApiResponse(responseCode = "400", description = "캐릭터 이름 업데이트 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
+    })
+    @PostMapping("/my")
+    public ResponseEntity<?> getMyCharacterInfo(@Parameter @CurrentUser UserPrincipal userPrincipal, @RequestBody UpdateNameReq updateNameReq){
+        return characterService.updateCharacterName(userPrincipal, updateNameReq);
+    }
 
 
 
