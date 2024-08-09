@@ -24,7 +24,7 @@ import java.time.LocalDate;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/quest")
 @Tag(name = "QuestController", description = "QuestController입니다.")
 public class QuestController {
     private final QuestService questService;
@@ -51,6 +51,7 @@ public class QuestController {
 //            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
             @Parameter(example = "2024-08-09", description = "날짜를 입력해주세요", required = true) @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @Parameter(description = "Access Token을 입력해주세요.", required = true) @PathVariable Long id){
+        System.out.println("date = " + date);
         return questService.retrieveQuest(date,id);
     }
     @GetMapping("/{id}")
