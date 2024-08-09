@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -47,29 +49,49 @@ public class QuestService {
 
         return createApiResponse((Message.builder().message("퀘스트를 만들었습니다.").build()));
     }
-    public ResponseEntity<?> retrieveQuest(Long id) {
+    public ResponseEntity<?> retrieveQuest(LocalDate localDate, Long id) {
         Character character = characterRepository.findById(id).orElseThrow(CharacterNotFoundException::new);
         List<Quest> quests = character.getQuests();
-
-        List<RetrieveQuestRes> retrieveQuestResList = quests.stream()
+        // 퀘스트 날짜 가져오기
+        List<Quest> dateQuests = quests.stream().filter(quest -> quest.getCreatedAt().toLocalDate().isEqual(localDate))
+                .collect(Collectors.toList());
+        // 퀘스트 미완료
+        List<RetrieveQuestRes> incompleteQuests = dateQuests.stream()
+                .filter(quest -> !quest.getIsComplete())
                 .map(quest -> RetrieveQuestRes.builder()
+                        .id(quest.getId())
+                        .contents(quest.getContents())
+                        .exp(quest.getExp())
+                        .build())
+                .collect(Collectors.toList());
+        // 퀘스트 완료
+        List<RetrieveQuestRes> completeQuests = dateQuests.stream()
+                .filter(quest -> quest.getIsComplete())
+                .map(quest -> RetrieveQuestRes.builder()
+                        .id(quest.getId())
                         .contents(quest.getContents())
                         .exp(quest.getExp())
                         .build())
                 .collect(Collectors.toList());
 
-        return createApiResponse(retrieveQuestResList);
+        //미완료 완료 합치기
+        List<RetrieveQuestRes> sortedQuests = new ArrayList<>();
+        sortedQuests.addAll(incompleteQuests);
+        sortedQuests.addAll(completeQuests);
+
+        return createApiResponse(sortedQuests);
     }
 
     public ResponseEntity<?> retrieveLevelAndTodayExp(Long id) {
         Character character = characterRepository.findById(id).orElseThrow(CharacterNotFoundException::new);
-
-        Long nextLevelNeedExp = (((character.getLevel()+1)*(character.getLevel()+2))*10)/2;
-        Long totalExp = character.getTotalExp();
+        Long level = character.getLevel();
+        System.out.println(character.getTotalExp());
+        Long acquireExp = character.getTotalExp() - (((level-1)*level)/2)*10;
 
         RetrieveLevelAndTodayExpRes retrieveLevelAndTodayExpRes = RetrieveLevelAndTodayExpRes.builder()
-                .level(character.getLevel())
-                .gauge(nextLevelNeedExp - totalExp)
+                .level(level)
+                .acquireExp(acquireExp)
+                .needExp(level*10)
                 .todayExp(character.getTodayExp())
                 .build();
 
