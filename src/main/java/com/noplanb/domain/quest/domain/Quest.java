@@ -26,4 +26,7 @@ public class Quest extends BaseEntity {
     public void updateCharacter(Character character) {
         this.character = character;
     }
+    public void updateContents(String contents) {
+        this.contents = contents;
+    }
 }
