@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,34 +55,20 @@ public class QuestService {
     public ResponseEntity<?> retrieveQuest(LocalDate localDate, Long id) {
         Character character = characterRepository.findById(id).orElseThrow(CharacterNotFoundException::new);
         List<Quest> quests = character.getQuests();
-        // 퀘스트 날짜 가져오기
-        List<Quest> dateQuests = quests.stream().filter(quest -> quest.getCreatedAt().toLocalDate().isEqual(localDate))
-                .collect(Collectors.toList());
-        // 퀘스트 미완료
-        List<RetrieveQuestRes> incompleteQuests = dateQuests.stream()
-                .filter(quest -> !quest.getIsComplete())
+        // 특정 날짜에 해당하는 퀘스트 필터링 후 미완료 완료 로 정렬 후 생성순으로 정렬
+        List<RetrieveQuestRes> retrieveQuestResList = quests.stream()
+                .filter(quest -> quest.getCreatedAt().toLocalDate().isEqual(localDate))
+                .sorted(Comparator.comparing(Quest::getIsComplete)
+                        .thenComparing(Quest::getCreatedAt))
                 .map(quest -> RetrieveQuestRes.builder()
                         .id(quest.getId())
                         .contents(quest.getContents())
                         .exp(quest.getExp())
-                        .build())
-                .collect(Collectors.toList());
-        // 퀘스트 완료
-        List<RetrieveQuestRes> completeQuests = dateQuests.stream()
-                .filter(quest -> quest.getIsComplete())
-                .map(quest -> RetrieveQuestRes.builder()
-                        .id(quest.getId())
-                        .contents(quest.getContents())
-                        .exp(quest.getExp())
+                        .isComplete(quest.getIsComplete())
                         .build())
                 .collect(Collectors.toList());
 
-        //미완료 완료 합치기
-        List<RetrieveQuestRes> sortedQuests = new ArrayList<>();
-        sortedQuests.addAll(incompleteQuests);
-        sortedQuests.addAll(completeQuests);
-
-        return createApiResponse(sortedQuests);
+        return createApiResponse(retrieveQuestResList);
     }
 
     public ResponseEntity<?> retrieveLevelAndTodayExp(Long id) {

@@ -13,4 +13,6 @@ public class RetrieveQuestRes {
     private String contents;
     @Schema(type = "Long", example = "5", description = "퀘스트 경험치")
     private Long exp;
+    @Schema(type = "Boolean", example = "true", description = "퀘스트 완료 여부")
+    private Boolean isComplete;
 }
