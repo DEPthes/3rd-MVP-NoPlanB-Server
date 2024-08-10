@@ -61,7 +61,6 @@ public class CustomDefaultOAuth2UserService extends DefaultOAuth2UserService {
     private User registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {
         User user = User.builder()
                 .provider(Provider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))
-                //.providerId(oAuth2UserInfo.getId())
                 .email(oAuth2UserInfo.getEmail())
                 .password(encodePassword(oAuth2UserInfo.getId()))
                 .role(Role.USER)
