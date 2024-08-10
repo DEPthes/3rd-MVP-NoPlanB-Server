@@ -32,6 +32,9 @@ jobs:
           
       - name: Generate application.yml
         run: |
+          mkdir -p src/main/resources/database
+          mkdir -p src/main/resources/s3
+          mkdir -p src/main/resources/oauth2
           echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application.yml
           echo "${{ secrets.APPLICATION_DATABASE_YML }}" | base64 --decode > src/main/resources/database/application-database.yml
           echo "${{ secrets.APPLICATION_S3_YML }}" | base64 --decode > src/main/resources/s3/application-s3.yml
