@@ -55,8 +55,8 @@ public class AuthService {
                         .userName(username)
                         .email(email)
                         .password(null)
-                        .provider(Provider.kakao)  // Provider 정보 설정 필요
-                        .role(Role.USER)  // Role 정보 설정 필요
+                        .provider(Provider.kakao)
+                        .role(Role.USER)
                         .build();
                 userRepository.save(user);
             }

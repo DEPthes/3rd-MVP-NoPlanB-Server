@@ -13,27 +13,23 @@ import java.util.List;
 @Data
 public class ErrorResponse {
     private LocalDateTime timestamp = LocalDateTime.now();
-
     private String message;
-
     private String code;
-
     @JsonProperty("class")
     private String clazz;
-
     private int status;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("errors")
-    private List<CustomFieldError> customFieldErrors = new ArrayList<>(); 
+    private List<CustomFieldError> customFieldErrors = new ArrayList<>();
 
     public ErrorResponse() {}
 
     @Builder
-    public ErrorResponse(String code, int status, String message, String clazz, List<FieldError> fieldErrors){
-        this.code = code;
-        this.status = status;
-        this.message = message;
+    public ErrorResponse(ErrorCode errorCode, String clazz, List<FieldError> fieldErrors){
+        this.code = errorCode.name();
+        this.status = errorCode.getStatus();
+        this.message = errorCode.getMessage();
         this.clazz = clazz;
         setFieldErrors(fieldErrors);
     }
@@ -51,7 +47,6 @@ public class ErrorResponse {
     }
 
     public static class CustomFieldError {
-
         private String field;
         private Object value;
         private String reason;
