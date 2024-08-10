@@ -1,5 +1,6 @@
 package com.noplanb.domain.character.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.noplanb.domain.common.BaseEntity;
 import com.noplanb.domain.item.domain.Item;
 import com.noplanb.domain.quest.domain.Quest;
@@ -27,12 +28,14 @@ public class Character extends BaseEntity {
     private Long totalQuest;
     private Long todayExp;
     private Long level;
+
 //    @OneToOne(mappedBy = "character", fetch = FetchType.LAZY)
 //    private User user;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", unique = true)
     private User user;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "character")
     private List<Quest> quests = new ArrayList<>();
     @OneToMany(mappedBy = "character")
