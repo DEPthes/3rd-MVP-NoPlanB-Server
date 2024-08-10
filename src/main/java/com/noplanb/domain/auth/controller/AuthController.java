@@ -3,6 +3,9 @@ package com.noplanb.domain.auth.controller;
 import com.noplanb.domain.auth.application.AuthService;
 import com.noplanb.domain.auth.dto.request.SigninReq;
 import com.noplanb.domain.auth.dto.response.LoginResponse;
+import com.noplanb.global.payload.ApiResponse;
+import com.noplanb.global.payload.ErrorCode;
+import com.noplanb.global.payload.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,9 +36,20 @@ public class AuthController {
             Map<String, String> response = new HashMap<>();
             response.put("accessToken", loginResponse.getAccessToken());
             response.put("refreshToken", loginResponse.getRefreshToken());
-            return ResponseEntity.ok(response);
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .check(true)
+                    .information(response)
+                    .build();
+            return ResponseEntity.ok(apiResponse);
+
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            ErrorCode errorCode = ErrorCode.INVALID_TOKEN;
+            ErrorResponse errorResponse = ErrorResponse.builder()
+                    .errorCode(ErrorCode.INVALID_TOKEN)
+                    .build();
+            return ResponseEntity.badRequest().body(errorResponse);
+
         }
     }
 }
