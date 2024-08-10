@@ -35,15 +35,18 @@ public class CharacterService {
 
     // 캐릭터 보여주기 메소드
     public MyCharaterListRes getMyCharacterDetail(UserPrincipal userPrincipal) {
-        User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+
         //유저의 item 중 is_equipped가 true인 것을 찾아서 item tyoe과 함께 반환
-        Character character = characterRepository.findByUser(user);
         List<Item> items = itemRepository.findByCharacter(character);
 
         // item status가 true인 것만 필터링 후 item type 정보와 함께 Response
 
         // 장착 중인 아이템만 필터링
-        List<Item> quippedItems = items.stream().filter(Item::isEquipped).toList();
+        List<Item> quippedItems = character.getItems().stream() //양방향 연관관계 사용
+                .filter(Item::isEquipped)
+                .toList();
+
         List<MyCharaterDetailRes> myCharaterDetailResList = quippedItems.stream().map(item -> MyCharaterDetailRes.builder()
                 .itemType(item.getItemType())
                 .itemImage((itemImageRepository.findItemImageByItem(item)).getItemImageUrl())

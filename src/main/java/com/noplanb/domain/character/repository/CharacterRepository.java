@@ -10,4 +10,6 @@ import java.util.Optional;
 @Repository
 public interface CharacterRepository extends JpaRepository<Character,Long> {
     Character findByUser(User user);
+
+    Optional<Character> findByUserId(Long id);
 }
