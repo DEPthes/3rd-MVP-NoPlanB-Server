@@ -2,7 +2,6 @@ package com.noplanb.domain.quest.controller;
 
 import com.noplanb.domain.quest.application.CalendarService;
 import com.noplanb.domain.quest.dto.res.RetrieveCalendarRes;
-import com.noplanb.domain.quest.dto.res.RetrieveQuestRes;
 import com.noplanb.global.payload.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.time.LocalDate;
 import java.time.YearMonth;
 
 @Controller
@@ -38,6 +36,6 @@ public class CalendarController {
 //            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
             @Parameter(example = "2024-08", description = "날짜를 입력해주세요", required = true) @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) YearMonth date,
             @Parameter(description = "Access Token을 입력해주세요.", required = true) @PathVariable Long id){
-        return calendarService.retrieveQuest(date,id);
+        return calendarService.retrieveCalendar(date,id);
     }
 }
