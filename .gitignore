@@ -43,7 +43,6 @@ out/
 
 ### ELSE ###
 application.yml
-#application-s3.yml
-classpath:/database/application-database.yml
-classpath:/oauth2/application-oauth2.yml
-classpath:/s3/application-s3.yml
+database/application-database.yml
+oauth2/application-oauth2.yml
+s3/application-s3.yml
