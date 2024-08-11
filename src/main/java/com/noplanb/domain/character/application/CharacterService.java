@@ -7,9 +7,7 @@ import com.noplanb.domain.character.dto.response.MyCharaterDetailRes;
 import com.noplanb.domain.character.dto.response.MyCharaterListRes;
 import com.noplanb.domain.character.repository.CharacterRepository;
 import com.noplanb.domain.item.domain.Item;
-import com.noplanb.domain.item.repository.ItemRepository;
 import com.noplanb.domain.item_image.domain.repository.ItemImageRepository;
-import com.noplanb.domain.user.repository.UserRepository;
 import com.noplanb.global.config.security.token.UserPrincipal;
 import com.noplanb.global.payload.ApiResponse;
 import com.noplanb.global.payload.Message;
@@ -28,8 +26,6 @@ import java.util.List;
 public class CharacterService {
 
     private final CharacterRepository characterRepository;
-    private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
     private final ItemImageRepository itemImageRepository;
 
     // 캐릭터 보여주기 메소드
@@ -37,7 +33,7 @@ public class CharacterService {
         Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
 
         //유저의 item 중 is_equipped가 true인 것을 찾아서 item type과 함께 반환
-        List<Item> items = itemRepository.findByCharacter(character);
+        List<Item> items = character.getItems();
 
         // item status가 true인 것만 필터링 후 item type 정보와 함께 Response
         // 장착 중인 아이템만 필터링 (item status가 true)
