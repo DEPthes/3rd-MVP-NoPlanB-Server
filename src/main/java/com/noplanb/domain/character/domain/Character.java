@@ -57,7 +57,7 @@ public class Character extends BaseEntity {
 
     public void updateCharacterName(String newCharacterName) {
         this.characterName = newCharacterName;
-
+    }
     public void updateTodayExp(){
         this.todayExp = 0l;
 
