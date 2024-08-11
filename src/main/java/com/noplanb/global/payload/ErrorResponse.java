@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ErrorResponse {
 
+
     private String message;
     private String code;
     private ErrorResponse(final ErrorCode code) {
@@ -21,11 +22,14 @@ public class ErrorResponse {
     public ErrorResponse(final ErrorCode code, final String message) {
         this.message = message;
         this.code = code.getCode();
+
     }
     public static ErrorResponse of(final ErrorCode code) {
         return new ErrorResponse(code);
     }
+
     public static ErrorResponse of(final ErrorCode code, final String message) {
         return new ErrorResponse(code, message);
+
     }
 }
