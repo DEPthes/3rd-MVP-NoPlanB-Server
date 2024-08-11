@@ -2,8 +2,10 @@ package com.noplanb.domain.quest.application;
 
 import com.noplanb.domain.character.domain.Character;
 import com.noplanb.domain.character.repository.CharacterRepository;
+import com.noplanb.domain.quest.domain.DailyExperience;
 import com.noplanb.domain.quest.domain.Quest;
 import com.noplanb.domain.quest.dto.res.RetrieveCalendarRes;
+import com.noplanb.domain.quest.repository.DailyExperienceRepository;
 import com.noplanb.global.payload.ApiResponse;
 import com.noplanb.global.payload.exception.CharacterNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,19 +24,19 @@ import java.util.stream.Stream;
 @Transactional(readOnly = true)
 public class CalendarService {
     private final CharacterRepository characterRepository;
+    private final DailyExperienceRepository dailyExperienceRepository;
 
-    public ResponseEntity<?> retrieveQuest(YearMonth date, Long id) {
-        Character character = characterRepository.findById(id).orElseThrow(CharacterNotFoundException::new);
-        List<Quest> quests = character.getQuests();
-        // YearMonth 필터링
-        List<Quest> filteredByDate = quests.stream()
-                .filter(quest -> YearMonth.from(quest.getCreatedAt().toLocalDate()).equals(date))
-                .collect(Collectors.toList());
+    public ResponseEntity<?> retrieveCalendar(YearMonth date, Long id) {
+        LocalDate startDate = date.atDay(1);
+        LocalDate endDate = date.atEndOfMonth();
 
-        List<RetrieveCalendarRes> calendarRes = filteredByDate.stream().
-                map(f -> RetrieveCalendarRes.builder()
-                        .id(f.getId())
-                        .exp(f.getExp())
+        //그 달의 첫날부터 마지막날까지의 경험치들 가져오기
+        List<DailyExperience> calendarList = dailyExperienceRepository.findByCharacterIdAndDateBetweenOrderByDateAsc(id, startDate, endDate);
+
+        List<RetrieveCalendarRes> calendarRes = calendarList.stream().
+                map(calendar -> RetrieveCalendarRes.builder()
+                        .date(calendar.getDate())
+                        .exp(calendar.getTodayExp())
                         .build())
                 .collect(Collectors.toList());
 
