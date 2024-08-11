@@ -8,9 +8,7 @@ import com.noplanb.domain.user.domain.Role;
 import com.noplanb.domain.user.domain.User;
 import com.noplanb.domain.user.repository.UserRepository;
 import com.noplanb.global.config.security.util.JwtTokenUtil;
-import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 

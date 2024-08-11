@@ -21,7 +21,6 @@ public class UserService {
         userRepository.save(user);
     }
 
-    @Transactional(readOnly = true)
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }

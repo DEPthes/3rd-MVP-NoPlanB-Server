@@ -45,9 +45,7 @@ public class AuthController {
 
         } catch (RuntimeException e) {
             ErrorCode errorCode = ErrorCode.INVALID_TOKEN;
-            ErrorResponse errorResponse = ErrorResponse.builder()
-                    .errorCode(ErrorCode.INVALID_TOKEN)
-                    .build();
+            ErrorResponse errorResponse = ErrorResponse.of(errorCode, e.getMessage());
             return ResponseEntity.badRequest().body(errorResponse);
 
         }
