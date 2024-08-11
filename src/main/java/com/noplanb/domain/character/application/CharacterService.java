@@ -9,7 +9,6 @@ import com.noplanb.domain.character.repository.CharacterRepository;
 import com.noplanb.domain.item.domain.Item;
 import com.noplanb.domain.item.repository.ItemRepository;
 import com.noplanb.domain.item_image.domain.repository.ItemImageRepository;
-import com.noplanb.domain.user.domain.User;
 import com.noplanb.domain.user.repository.UserRepository;
 import com.noplanb.global.config.security.token.UserPrincipal;
 import com.noplanb.global.payload.ApiResponse;
@@ -37,15 +36,12 @@ public class CharacterService {
     public MyCharaterListRes getMyCharacterDetail(UserPrincipal userPrincipal) {
         Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
 
-        //유저의 item 중 is_equipped가 true인 것을 찾아서 item tyoe과 함께 반환
+        //유저의 item 중 is_equipped가 true인 것을 찾아서 item type과 함께 반환
         List<Item> items = itemRepository.findByCharacter(character);
 
         // item status가 true인 것만 필터링 후 item type 정보와 함께 Response
-
-        // 장착 중인 아이템만 필터링
-        List<Item> quippedItems = character.getItems().stream() //양방향 연관관계 사용
-                .filter(Item::isEquipped)
-                .toList();
+        // 장착 중인 아이템만 필터링 (item status가 true)
+        List<Item> quippedItems = items.stream().filter(Item::isEquipped).toList();
 
         List<MyCharaterDetailRes> myCharaterDetailResList = quippedItems.stream().map(item -> MyCharaterDetailRes.builder()
                 .itemType(item.getItemType())
@@ -67,11 +63,11 @@ public class CharacterService {
 
     // 캐릭터 상태 + 이름 + 성장 시작일 + 총 경험치 + 달성한 전체 퀘스트 개수 + 성장일 반환
     public ResponseEntity<?> getMyCharacterInfo(UserPrincipal userPrincipal){
-        //캐릭터 상태
-        MyCharaterListRes myCharaterListRes = getMyCharacterDetail(userPrincipal);
+        // 캐릭터 상태
+        MyCharaterListRes myCharaterListRes = getMyCharacterDetail(userPrincipal); //캐릭터 상세(아이템 장착 정보) 가져오기 메소드 호출
 
-        User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        Character character = characterRepository.findByUser(user);
+        // 아이템 장착 이외 정보를 가져오기 위한 캐릭터 객체 불러오기
+        Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
 
         // 캐릭터 이름
         String characterName = character.getCharacterName();
@@ -97,32 +93,9 @@ public class CharacterService {
     }
 
 
-    public ResponseEntity<?> getMyCharacterDetailbyUserId(int i) {
-        User user= userRepository.findById((long) i).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        //유저의 item 중 is_equipped가 true인 것을 찾아서 item tyoe과 함께 반환
-        Character character = characterRepository.findByUser(user);
-        List<Item> items = itemRepository.findByCharacter(character);
-
-        // item status가 true인 것만 필터링 후 item type 정보와 함께 Response
-
-        // 장착 중인 아이템만 필터링
-        List<Item> quippedItems = items.stream().filter(Item::isEquipped).toList();
-        List<MyCharaterDetailRes> myCharaterDetailResList = quippedItems.stream().map(item -> MyCharaterDetailRes.builder()
-                .itemType(item.getItemType())
-                .itemImage((itemImageRepository.findItemImageByItem(item).getItemImageUrl()))
-                .build()).toList();
-
-        MyCharaterListRes myCharaterListRes = MyCharaterListRes.builder()
-                .myCharaterDetailResList(myCharaterDetailResList)
-                .build();
-
-        return ResponseEntity.ok(myCharaterListRes);
-    }
-
     @Transactional
     public ResponseEntity<?> updateCharacterName(UserPrincipal userPrincipal, UpdateNameReq updateNameReq) {
-        User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        Character character = characterRepository.findByUser(user);
+        Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
 
         String newCharacterName = updateNameReq.getNewCharacterName();
         character.updateCharacterName(newCharacterName);
