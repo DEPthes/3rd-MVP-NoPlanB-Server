@@ -21,10 +21,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         log.error("Responding with unauthorized error. Message - {}", authException.getMessage());
 
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .errorCode(ErrorCode.INVALID_AUTHENTICATION)
-                .clazz(authException.getClass().getName())
-                .build();
+        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.INVALID_AUTHENTICATION, authException.getMessage());
 
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
