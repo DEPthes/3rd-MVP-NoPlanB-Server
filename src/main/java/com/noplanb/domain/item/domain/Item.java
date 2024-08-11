@@ -19,7 +19,8 @@ public class Item extends BaseEntity {
     private String item_name;
     @Enumerated(EnumType.STRING)
     private ItemType itemType;
-    private boolean  isEquipped;
+    private boolean isEquipped;
+    private boolean itemStatus;
     private Long requiredLevel;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "character_id")
@@ -27,5 +28,8 @@ public class Item extends BaseEntity {
 
     public void updateCharacter(Character character) {
         this.character = character;
+    }
+    public void updateItemStatus(Boolean itemStatus) {
+        this.itemStatus = itemStatus;
     }
 }
