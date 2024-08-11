@@ -36,7 +36,7 @@ public class Character extends BaseEntity {
     private User user;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "character")
+    @OneToMany(mappedBy = "character", fetch = FetchType.LAZY)
     private List<Quest> quests = new ArrayList<>();
     @OneToMany(mappedBy = "character")
     private List<Item> items = new ArrayList<>();

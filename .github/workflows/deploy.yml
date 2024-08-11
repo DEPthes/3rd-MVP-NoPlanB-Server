@@ -32,12 +32,13 @@ jobs:
           
       - name: Generate application.yml
         run: |
-          mkdir -p ./src/main/resources
-          cd ./src/main/resources
-          touch ./application.yml
-          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > ./application.yml
-          touch ./application-s3.yml
-          echo "${{ secrets.APPLICATION_S3_YML }}" | base64 --decode > ./application-s3.yml
+          mkdir -p src/main/resources/database
+          mkdir -p src/main/resources/s3
+          mkdir -p src/main/resources/oauth2
+          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_DATABASE_YML }}" | base64 --decode > src/main/resources/database/application-database.yml
+          echo "${{ secrets.APPLICATION_S3_YML }}" | base64 --decode > src/main/resources/s3/application-s3.yml
+          echo "${{ secrets.APPLICATION_OAUTH2_YML }}" | base64 --decode > src/main/resources/oauth2/application-oauth2.yml
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v3
