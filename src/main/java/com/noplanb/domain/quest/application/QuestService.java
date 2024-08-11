@@ -2,11 +2,13 @@ package com.noplanb.domain.quest.application;
 
 import com.noplanb.domain.character.domain.Character;
 import com.noplanb.domain.character.repository.CharacterRepository;
+import com.noplanb.domain.quest.domain.DailyExperience;
 import com.noplanb.domain.quest.domain.Quest;
 import com.noplanb.domain.quest.dto.req.CreateQuestReq;
 import com.noplanb.domain.quest.dto.req.ModifyQuestReq;
 import com.noplanb.domain.quest.dto.res.RetrieveLevelAndTodayExpRes;
 import com.noplanb.domain.quest.dto.res.RetrieveQuestRes;
+import com.noplanb.domain.quest.repository.DailyExperienceRepository;
 import com.noplanb.domain.quest.repository.QuestRepository;
 import com.noplanb.global.payload.ApiResponse;
 import com.noplanb.global.payload.Message;
@@ -14,26 +16,21 @@ import com.noplanb.global.payload.exception.CharacterNotFoundException;
 import com.noplanb.global.payload.exception.QuestNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static com.noplanb.global.payload.ErrorCode.CHARACTER_NOT_FOUND;
-
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class QuestService {
     private final CharacterRepository characterRepository;
     private final QuestRepository questRepository;
+    private final DailyExperienceRepository dailyExperienceRepository;
 
     @Transactional
     public ResponseEntity<?> createQuest(CreateQuestReq createQuestReq, Long id) {
@@ -108,6 +105,21 @@ public class QuestService {
         questRepository.delete(quest);
 
         return createApiResponse(Message.builder().message("퀘스트를 삭제했습니다.").build());
+    }
+    @Transactional
+    @Scheduled(cron = "0 0 0 * * *")
+    public void resetDailyExperience() {
+        List<Character> characters = characterRepository.findAll();
+        for (Character character : characters) {
+            // 어제 날짜로 DailyExperience 엔티티에 저장
+            LocalDate yesterday = LocalDate.now().minusDays(1);
+            DailyExperience dailyExperience = new DailyExperience(character.getId(), yesterday, character.getTodayExp());
+            dailyExperienceRepository.save(dailyExperience);
+
+            // 사용자 경험치 초기화
+            character.updateTodayExp();
+        }
+//        characterRepository.saveAll(characters);
     }
     private <T> ResponseEntity<ApiResponse> createApiResponse(T information) {
         ApiResponse apiResponse = ApiResponse.builder()

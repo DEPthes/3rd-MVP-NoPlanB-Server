@@ -43,4 +43,7 @@ public class Character extends BaseEntity {
         item.updateCharacter(this);
 
     }
+    public void updateTodayExp(){
+        this.todayExp = 0l;
+    }
 }
