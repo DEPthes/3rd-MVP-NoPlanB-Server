@@ -8,7 +8,7 @@ import lombok.Getter;
 @Builder
 @Schema(description = "ModifyQuestReq")
 public class ModifyQuestReq {
-    @Schema(type = "Long", example = "1", description = "퀘스트 ID")
+    @Schema(type = "Long", example = "1", description = "수정할 퀘스트 ID")
     private Long id;
     @Schema(type = "String", example = "빨래하기", description = "퀘스트 내용")
     private String contents;

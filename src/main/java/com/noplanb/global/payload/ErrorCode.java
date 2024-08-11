@@ -29,7 +29,6 @@ public enum ErrorCode {
     private final HttpStatus status;
 
     ErrorCode(final HttpStatus status, final String code, final String message) {
-//        System.out.println("message = " + message);
         this.status = status;
         this.code = code;
         this.message = message;

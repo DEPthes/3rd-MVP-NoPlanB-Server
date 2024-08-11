@@ -6,6 +6,7 @@ import com.noplanb.domain.quest.domain.DailyExperience;
 import com.noplanb.domain.quest.domain.Quest;
 import com.noplanb.domain.quest.dto.res.RetrieveCalendarRes;
 import com.noplanb.domain.quest.repository.DailyExperienceRepository;
+import com.noplanb.global.config.security.token.UserPrincipal;
 import com.noplanb.global.payload.ApiResponse;
 import com.noplanb.global.payload.exception.CharacterNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +27,12 @@ public class CalendarService {
     private final CharacterRepository characterRepository;
     private final DailyExperienceRepository dailyExperienceRepository;
 
-    public ResponseEntity<?> retrieveCalendar(YearMonth date, Long id) {
+    public ResponseEntity<?> retrieveCalendar(YearMonth date, UserPrincipal userPrincipal) {
         LocalDate startDate = date.atDay(1);
         LocalDate endDate = date.atEndOfMonth();
 
         //그 달의 첫날부터 마지막날까지의 경험치들 가져오기
-        List<DailyExperience> calendarList = dailyExperienceRepository.findByCharacterIdAndDateBetweenOrderByDateAsc(id, startDate, endDate);
+        List<DailyExperience> calendarList = dailyExperienceRepository.findByCharacterIdAndDateBetweenOrderByDateAsc(userPrincipal.getId(), startDate, endDate);
 
         List<RetrieveCalendarRes> calendarRes = calendarList.stream().
                 map(calendar -> RetrieveCalendarRes.builder()
