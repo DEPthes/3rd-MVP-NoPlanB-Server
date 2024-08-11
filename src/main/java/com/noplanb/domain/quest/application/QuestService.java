@@ -10,6 +10,7 @@ import com.noplanb.domain.quest.dto.res.RetrieveLevelAndTodayExpRes;
 import com.noplanb.domain.quest.dto.res.RetrieveQuestRes;
 import com.noplanb.domain.quest.repository.DailyExperienceRepository;
 import com.noplanb.domain.quest.repository.QuestRepository;
+import com.noplanb.global.config.security.token.UserPrincipal;
 import com.noplanb.global.payload.ApiResponse;
 import com.noplanb.global.payload.Message;
 import com.noplanb.global.payload.exception.CharacterNotFoundException;
@@ -33,8 +34,8 @@ public class QuestService {
     private final DailyExperienceRepository dailyExperienceRepository;
 
     @Transactional
-    public ResponseEntity<?> createQuest(CreateQuestReq createQuestReq, Long id) {
-        Character character = characterRepository.findById(id).orElseThrow(CharacterNotFoundException::new);
+    public ResponseEntity<?> createQuest(CreateQuestReq createQuestReq, UserPrincipal userPrincipal) {
+        Character character = characterRepository.findById(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
 
         Quest quest = Quest.builder()
                 .contents(createQuestReq.getContents())
@@ -49,8 +50,8 @@ public class QuestService {
 
         return createApiResponse((Message.builder().message("퀘스트를 만들었습니다.").build()));
     }
-    public ResponseEntity<?> retrieveQuest(LocalDate localDate, Long id) {
-        Character character = characterRepository.findById(id).orElseThrow(CharacterNotFoundException::new);
+    public ResponseEntity<?> retrieveQuest(LocalDate localDate, UserPrincipal userPrincipal) {
+        Character character = characterRepository.findById(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
         List<Quest> quests = character.getQuests();
         // 특정 날짜에 해당하는 퀘스트 필터링 후 미완료 완료 로 정렬 후 생성순으로 정렬
         List<RetrieveQuestRes> retrieveQuestResList = quests.stream()
@@ -68,8 +69,8 @@ public class QuestService {
         return createApiResponse(retrieveQuestResList);
     }
 
-    public ResponseEntity<?> retrieveLevelAndTodayExp(Long id) {
-        Character character = characterRepository.findById(id).orElseThrow(CharacterNotFoundException::new);
+    public ResponseEntity<?> retrieveLevelAndTodayExp(UserPrincipal userPrincipal) {
+        Character character = characterRepository.findById(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
         Long level = character.getLevel();
         Long acquireExp = character.getTotalExp() - (((level-1)*level)/2)*10;
 
@@ -83,8 +84,8 @@ public class QuestService {
         return createApiResponse(retrieveLevelAndTodayExpRes);
     }
     @Transactional
-    public ResponseEntity<?> modifyQuest(Long id, ModifyQuestReq modifyQuestReq) {
-        Character character = characterRepository.findById(id).orElseThrow(CharacterNotFoundException::new);
+    public ResponseEntity<?> modifyQuest(UserPrincipal userPrincipal, ModifyQuestReq modifyQuestReq) {
+        Character character = characterRepository.findById(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
         List<Quest> quests = character.getQuests();
         // 퀘스트 날짜 가져오기
         Quest quest = quests.stream().filter(q -> q.getId().equals(modifyQuestReq.getId()))
@@ -95,8 +96,8 @@ public class QuestService {
         return createApiResponse(Message.builder().message("퀘스트를 수정했습니다.").build());
     }
     @Transactional
-    public ResponseEntity<?> deleteQuest(Long userId,Long id) {
-        Character character = characterRepository.findById(userId).orElseThrow(CharacterNotFoundException::new);
+    public ResponseEntity<?> deleteQuest(UserPrincipal userPrincipal, Long id) {
+        Character character = characterRepository.findById(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
         List<Quest> quests = character.getQuests();
 
         Quest quest = quests.stream().filter(q -> q.getId().equals(id))
@@ -119,7 +120,6 @@ public class QuestService {
             // 사용자 경험치 초기화
             character.updateTodayExp();
         }
-//        characterRepository.saveAll(characters);
     }
     private <T> ResponseEntity<ApiResponse> createApiResponse(T information) {
         ApiResponse apiResponse = ApiResponse.builder()

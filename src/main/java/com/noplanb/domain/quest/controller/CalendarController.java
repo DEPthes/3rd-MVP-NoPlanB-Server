@@ -2,6 +2,8 @@ package com.noplanb.domain.quest.controller;
 
 import com.noplanb.domain.quest.application.CalendarService;
 import com.noplanb.domain.quest.dto.res.RetrieveCalendarRes;
+import com.noplanb.global.config.security.token.CurrentUser;
+import com.noplanb.global.config.security.token.UserPrincipal;
 import com.noplanb.global.payload.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,16 +28,15 @@ import java.time.YearMonth;
 @Tag(name = "CalendarController", description = "CalendarController입니다.")
 public class CalendarController {
     private final CalendarService calendarService;
-    @GetMapping("/{date}/{id}")
+    @GetMapping("/{date}")
     @Operation(summary = "달력 경험치 조회", description = "달력경험치를 조회할 때 사용하는 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "달력 조회 성공", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RetrieveCalendarRes.class))}),
             @ApiResponse(responseCode = "400", description = "달력 조회 실패", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     public ResponseEntity<?> retrieveCalendar(
-//            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
             @Parameter(example = "2024-08", description = "날짜를 입력해주세요", required = true) @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) YearMonth date,
-            @Parameter(description = "Access Token을 입력해주세요.", required = true) @PathVariable Long id){
-        return calendarService.retrieveCalendar(date,id);
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal){
+        return calendarService.retrieveCalendar(date,userPrincipal);
     }
 }
