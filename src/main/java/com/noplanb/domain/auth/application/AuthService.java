@@ -8,7 +8,9 @@ import com.noplanb.domain.user.domain.Role;
 import com.noplanb.domain.user.domain.User;
 import com.noplanb.domain.user.repository.UserRepository;
 import com.noplanb.global.config.security.util.JwtTokenUtil;
+import com.noplanb.global.payload.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +35,7 @@ public class AuthService {
         return idTokenVerifier.verifyIdToken(idToken, email);
     }
 
-    public LoginResponse loginWithIdToken(String idToken, String email) {
+    public ResponseEntity<?> loginWithIdToken(String idToken, String email) {
         String username = verifyIdTokenAndExtractUsername(idToken, email);
         if (username != null) {
             String accessToken = jwtTokenUtil.generateToken(new HashMap<>(), username);
@@ -59,7 +61,18 @@ public class AuthService {
                 userRepository.save(user);
             }
 
-            return new LoginResponse(accessToken, refreshToken);
+            LoginResponse loginResponse = LoginResponse.builder()
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .build();
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .check(true)
+                    .information(loginResponse)
+                    .build();
+
+            return ResponseEntity.ok(apiResponse);
+
         } else {
             throw new RuntimeException("유효하지 않은 ID 토큰");
         }
