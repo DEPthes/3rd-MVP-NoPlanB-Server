@@ -51,7 +51,7 @@ public class CharacterController {
         return characterService.getMyCharacterInfo(userPrincipal);
     }
 
-    @Operation(summary = "캐릭터와 이름 업데이터 API", description = "마이페이지에서 캐릭터 이름을 변경하는 API입니다.")
+    @Operation(summary = "캐릭터와 이름 업데이트 API", description = "마이페이지에서 캐릭터 이름을 변경하는 API입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "캐릭터 이름 업데이트 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Message.class) ) } ),
             @ApiResponse(responseCode = "400", description = "캐릭터 이름 업데이트 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
