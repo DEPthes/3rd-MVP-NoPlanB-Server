@@ -1,6 +1,7 @@
 package com.noplanb.domain.item.dto.response;
 
 
+import com.noplanb.domain.item.domain.ItemType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +23,7 @@ public class CategoryItemRes {
     private String itemImage;
 
     @Schema(type = "String", example = "모자", description = "아이템 타입")
-    private String itemType;
+    private ItemType itemType;
 
     @Schema(type = "boolean", example = "false", description = "장착 가능여부 ( = 잠금해제여부)")
     private boolean ableToEquip;
