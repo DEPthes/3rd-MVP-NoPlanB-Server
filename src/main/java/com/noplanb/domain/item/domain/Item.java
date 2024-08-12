@@ -16,7 +16,7 @@ public class Item extends BaseEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
-    private String item_name;
+    private String itemName;
     @Enumerated(EnumType.STRING)
     private ItemType itemType;
     private boolean  isEquipped;
