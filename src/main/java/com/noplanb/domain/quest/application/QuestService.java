@@ -102,8 +102,6 @@ public class QuestService {
         quest.updateIsComplete(Boolean.TRUE);
         //오늘얻은 경험치 update
         character.updateExp(quest.getExp());
-        System.out.println("character = " + character.getTotalExp());
-        System.out.println("(((characterLevel)*characterLevel+1)/2)*10 = " + ((characterLevel*(characterLevel+1)/2)*10));
 
         // 레벨업 확인
         if (character.getTotalExp()>((characterLevel*(characterLevel+1)/2)*10)){
