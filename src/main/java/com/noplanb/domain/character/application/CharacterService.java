@@ -54,7 +54,12 @@ public class CharacterService {
     // 캐릭터 상태만을 그대로 반환
     public ResponseEntity<?> getMyCharacter(UserPrincipal userPrincipal){
         MyCharaterListRes myCharaterListRes = getMyCharacterDetail(userPrincipal);
-        return ResponseEntity.ok(myCharaterListRes);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(myCharaterListRes)
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     // 캐릭터 상태 + 이름 + 성장 시작일 + 총 경험치 + 달성한 전체 퀘스트 개수 + 성장일 반환
@@ -85,7 +90,12 @@ public class CharacterService {
                 .myCharaterDetailResList(myCharaterListRes.getMyCharaterDetailResList())
                 .build();
 
-        return ResponseEntity.ok(myCharacterInfoRes);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(myCharacterInfoRes)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
     }
 
 
