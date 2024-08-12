@@ -113,6 +113,7 @@ public class QuestService {
             if (character.getLevel() % 5 == 0) {
                 //아이템 해금
                 List<Item> unLockItems = unLockItem(character.getLevel(), character);
+                //해금된 아이템들 이미지 반환
                 List<RetrieveLevelUpItemImage> unLockImages = unLockItems.stream()
                         .map(item -> RetrieveLevelUpItemImage.builder()
                                 .itemImageUrl(itemImageRepository.findItemImageByItem(item).getItemImageUrl())
@@ -129,8 +130,6 @@ public class QuestService {
         List<Item> items = character.getItems();
         List<Item> lockItems = items.stream().filter(item -> item.getRequiredLevel().equals(level))
                 .collect(Collectors.toList());
-        lockItems.stream()
-                .forEach(item -> item.updateItemStatus(Boolean.TRUE));
         return lockItems;
 
     }
