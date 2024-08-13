@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,6 +44,7 @@ public class QuestService {
         Character character = characterRepository.findById(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
 
         Quest quest = Quest.builder()
+                .createdTime(LocalDateTime.now())
                 .contents(createQuestReq.getContents())
                 .exp(createQuestReq.getExp())
                 .character(character)
@@ -60,9 +62,9 @@ public class QuestService {
         List<Quest> quests = character.getQuests();
         // 특정 날짜에 해당하는 퀘스트 필터링 후 미완료 완료 로 정렬 후 생성순으로 정렬
         List<RetrieveQuestRes> retrieveQuestResList = quests.stream()
-                .filter(quest -> quest.getCreatedAt().toLocalDate().isEqual(localDate))
+                .filter(quest -> quest.getCreatedTime().toLocalDate().isEqual(localDate))
                 .sorted(Comparator.comparing(Quest::getIsComplete)
-                        .thenComparing(Quest::getCreatedAt))
+                        .thenComparing(Quest::getCreatedTime))
                 .map(quest -> RetrieveQuestRes.builder()
                         .id(quest.getId())
                         .contents(quest.getContents())

@@ -5,6 +5,8 @@ import com.noplanb.domain.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -22,6 +24,8 @@ public class Quest extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "character_id")
     private Character character;
+    private LocalDateTime createdTime;
+
 
     public void updateCharacter(Character character) {
         this.character = character;
