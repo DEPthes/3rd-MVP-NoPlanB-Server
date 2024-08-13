@@ -64,6 +64,17 @@ public class QuestController {
         @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal){
         return questService.retrieveLevelAndTodayExp(userPrincipal);
     }
+    @PostMapping("/{id}")
+    @Operation(summary = "퀘스트 완료", description = "퀘스트 완료할 때 사용하는 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "퀘스트 완료 성공", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Message.class))}),
+            @ApiResponse(responseCode = "400", description = "퀘스트 완료 실패", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    public ResponseEntity<?> completeQuest(
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
+            @Parameter(description = "완료할 퀘스트 아이디를 입력해주세요.", required = true) @PathVariable Long id){
+        return questService.completeQuest(userPrincipal,id);
+    }
 
     @PatchMapping
     @Operation(summary = "퀘스트 수정", description = "퀘스트 수정할 때 사용하는 API")

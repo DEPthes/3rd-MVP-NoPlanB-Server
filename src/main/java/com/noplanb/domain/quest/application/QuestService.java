@@ -2,11 +2,15 @@ package com.noplanb.domain.quest.application;
 
 import com.noplanb.domain.character.domain.Character;
 import com.noplanb.domain.character.repository.CharacterRepository;
+import com.noplanb.domain.item.domain.Item;
+import com.noplanb.domain.item_image.domain.ItemImage;
+import com.noplanb.domain.item_image.domain.repository.ItemImageRepository;
 import com.noplanb.domain.quest.domain.DailyExperience;
 import com.noplanb.domain.quest.domain.Quest;
 import com.noplanb.domain.quest.dto.req.CreateQuestReq;
 import com.noplanb.domain.quest.dto.req.ModifyQuestReq;
 import com.noplanb.domain.quest.dto.res.RetrieveLevelAndTodayExpRes;
+import com.noplanb.domain.quest.dto.res.RetrieveLevelUpItemImage;
 import com.noplanb.domain.quest.dto.res.RetrieveQuestRes;
 import com.noplanb.domain.quest.repository.DailyExperienceRepository;
 import com.noplanb.domain.quest.repository.QuestRepository;
@@ -32,6 +36,7 @@ public class QuestService {
     private final CharacterRepository characterRepository;
     private final QuestRepository questRepository;
     private final DailyExperienceRepository dailyExperienceRepository;
+    private final ItemImageRepository itemImageRepository;
 
     @Transactional
     public ResponseEntity<?> createQuest(CreateQuestReq createQuestReq, UserPrincipal userPrincipal) {
@@ -84,10 +89,54 @@ public class QuestService {
         return createApiResponse(retrieveLevelAndTodayExpRes);
     }
     @Transactional
+    public ResponseEntity<?> completeQuest(UserPrincipal userPrincipal, Long id) {
+        Character character = characterRepository.findById(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
+        Long characterLevel = character.getLevel();
+        List<Quest> quests = character.getQuests();
+        // 퀘스트 가져오기
+        Quest quest = quests.stream().filter(q -> q.getId().equals(id))
+                .findFirst()
+                .orElseThrow(QuestNotFoundException::new);
+
+        //퀘스트 완료처리
+        quest.updateIsComplete(Boolean.TRUE);
+        //오늘얻은 경험치 update
+        character.updateExp(quest.getExp());
+
+        // 레벨업 확인
+        if (character.getTotalExp()>((characterLevel*(characterLevel+1)/2)*10)){
+            // 레벨업
+            character.updateLevel();
+            // 레벌업된 레벨이 해금대상인지 확인
+            if (character.getLevel() % 5 == 0) {
+                //아이템 해금
+                List<Item> unLockItems = unLockItem(character.getLevel(), character);
+                //해금된 아이템들 이미지 반환
+                List<RetrieveLevelUpItemImage> unLockImages = unLockItems.stream()
+                        .map(item -> RetrieveLevelUpItemImage.builder()
+                                .itemImageUrl(itemImageRepository.findItemImageByItem(item).getItemImageUrl())
+                                .build())
+                        .collect(Collectors.toList());
+                return createApiResponse(unLockImages);
+            }
+            return createApiResponse(Message.builder().message("레벨업을 했습니다!").build());
+        }
+        return createApiResponse(Message.builder().message("퀘스트를 완료했습니다!").build());
+    }
+
+    private List<Item> unLockItem(Long level, Character character) {
+        List<Item> items = character.getItems();
+        List<Item> lockItems = items.stream().filter(item -> item.getRequiredLevel().equals(level))
+                .collect(Collectors.toList());
+        return lockItems;
+
+    }
+
+    @Transactional
     public ResponseEntity<?> modifyQuest(UserPrincipal userPrincipal, ModifyQuestReq modifyQuestReq) {
         Character character = characterRepository.findById(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
         List<Quest> quests = character.getQuests();
-        // 퀘스트 날짜 가져오기
+        // 퀘스트 가져오기
         Quest quest = quests.stream().filter(q -> q.getId().equals(modifyQuestReq.getId()))
                 .findFirst()
                 .orElseThrow(QuestNotFoundException::new);
@@ -118,9 +167,10 @@ public class QuestService {
             dailyExperienceRepository.save(dailyExperience);
 
             // 사용자 경험치 초기화
-            character.updateTodayExp();
+            character.resetTodayExp();
         }
     }
+
     private <T> ResponseEntity<ApiResponse> createApiResponse(T information) {
         ApiResponse apiResponse = ApiResponse.builder()
                 .check(true)

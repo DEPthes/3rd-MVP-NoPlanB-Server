@@ -19,7 +19,7 @@ public class Item extends BaseEntity {
     private String itemName;
     @Enumerated(EnumType.STRING)
     private ItemType itemType;
-    private boolean  isEquipped;
+    private boolean isEquipped;
     private Long requiredLevel;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "character_id")

@@ -29,4 +29,7 @@ public class Quest extends BaseEntity {
     public void updateContents(String contents) {
         this.contents = contents;
     }
+    public void updateIsComplete(Boolean isComplete) {
+        this.isComplete = isComplete;
+    }
 }
