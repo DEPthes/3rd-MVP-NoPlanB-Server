@@ -43,6 +43,8 @@ out/
 
 ### ELSE ###
 application.yml
-database/application-database.yml
-oauth2/application-oauth2.yml
-s3/application-s3.yml
+
+src/main/resources/data.sql
+src/main/resources/oauth2/application-oauth2.yml
+src/main/resources/s3/application-s3.yml
+src/main/resources/database/application-database.yml

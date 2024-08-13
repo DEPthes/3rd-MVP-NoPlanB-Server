@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,6 +44,7 @@ public class QuestService {
         Character character = characterRepository.findById(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
 
         Quest quest = Quest.builder()
+                .createdTime(LocalDateTime.now())
                 .contents(createQuestReq.getContents())
                 .exp(createQuestReq.getExp())
                 .character(character)
@@ -60,9 +62,9 @@ public class QuestService {
         List<Quest> quests = character.getQuests();
         // 특정 날짜에 해당하는 퀘스트 필터링 후 미완료 완료 로 정렬 후 생성순으로 정렬
         List<RetrieveQuestRes> retrieveQuestResList = quests.stream()
-                .filter(quest -> quest.getCreatedAt().toLocalDate().isEqual(localDate))
+                .filter(quest -> quest.getCreatedTime().toLocalDate().isEqual(localDate))
                 .sorted(Comparator.comparing(Quest::getIsComplete)
-                        .thenComparing(Quest::getCreatedAt))
+                        .thenComparing(Quest::getCreatedTime))
                 .map(quest -> RetrieveQuestRes.builder()
                         .id(quest.getId())
                         .contents(quest.getContents())
@@ -102,8 +104,6 @@ public class QuestService {
         quest.updateIsComplete(Boolean.TRUE);
         //오늘얻은 경험치 update
         character.updateExp(quest.getExp());
-        System.out.println("character = " + character.getTotalExp());
-        System.out.println("(((characterLevel)*characterLevel+1)/2)*10 = " + ((characterLevel*(characterLevel+1)/2)*10));
 
         // 레벨업 확인
         if (character.getTotalExp()>((characterLevel*(characterLevel+1)/2)*10)){
@@ -113,6 +113,7 @@ public class QuestService {
             if (character.getLevel() % 5 == 0) {
                 //아이템 해금
                 List<Item> unLockItems = unLockItem(character.getLevel(), character);
+                //해금된 아이템들 이미지 반환
                 List<RetrieveLevelUpItemImage> unLockImages = unLockItems.stream()
                         .map(item -> RetrieveLevelUpItemImage.builder()
                                 .itemImageUrl(itemImageRepository.findItemImageByItem(item).getItemImageUrl())
@@ -129,8 +130,6 @@ public class QuestService {
         List<Item> items = character.getItems();
         List<Item> lockItems = items.stream().filter(item -> item.getRequiredLevel().equals(level))
                 .collect(Collectors.toList());
-        lockItems.stream()
-                .forEach(item -> item.updateItemStatus(Boolean.TRUE));
         return lockItems;
 
     }
