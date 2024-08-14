@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/character")
-@Tag(name = "CharacterController", description = "CharacterController입니다.")
+@Tag(name = "Character", description = "캐릭터 관련 API")
 public class CharacterController {
 
     private final CharacterService characterService;

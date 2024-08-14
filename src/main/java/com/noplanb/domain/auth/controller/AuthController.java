@@ -6,15 +6,16 @@ import com.noplanb.domain.auth.dto.response.LoginResponse;
 import com.noplanb.global.payload.ApiResponse;
 import com.noplanb.global.payload.ErrorCode;
 import com.noplanb.global.payload.ErrorResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag(name = "Auth", description = "로그인 관련 API")
 public class AuthController {
 
     private final AuthService authService;
