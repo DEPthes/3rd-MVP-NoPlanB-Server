@@ -3,9 +3,14 @@ package com.noplanb.domain.auth.controller;
 import com.noplanb.domain.auth.application.AuthService;
 import com.noplanb.domain.auth.dto.request.SigninReq;
 import com.noplanb.domain.auth.dto.response.LoginResponse;
-import com.noplanb.global.payload.ApiResponse;
+import com.noplanb.domain.character.dto.response.MyCharaterListRes;
 import com.noplanb.global.payload.ErrorCode;
 import com.noplanb.global.payload.ErrorResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +25,11 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @Operation(summary = "카카오 로그인 API", description = "카카오 로그인 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "로그인 및 토큰 발급 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation =LoginResponse.class) ) } ),
+            @ApiResponse(responseCode = "400", description = "로그인 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
+    })
     @PostMapping("/idTokenLogin")
     public ResponseEntity<?> idTokenLogin(@RequestBody SigninReq signinReq) {
         String accessToken = signinReq.getAccessToken();
@@ -38,7 +48,6 @@ public class AuthController {
             ErrorCode errorCode = ErrorCode.INVALID_TOKEN;
             ErrorResponse errorResponse = ErrorResponse.of(errorCode, e.getMessage());
             return ResponseEntity.badRequest().body(errorResponse);
-
         }
     }
 }
