@@ -1,7 +1,7 @@
 package com.noplanb.domain.character.application;
 
 import com.noplanb.domain.character.domain.Character;
-import com.noplanb.domain.character.dto.request.NewCharacterReq;
+// import com.noplanb.domain.character.dto.request.NewCharacterReq;
 import com.noplanb.domain.character.dto.request.UpdateNameReq;
 import com.noplanb.domain.character.dto.response.InitialCharacterInfoRes;
 import com.noplanb.domain.character.dto.response.MyCharacterInfoRes;
@@ -10,7 +10,9 @@ import com.noplanb.domain.character.dto.response.MyCharaterListRes;
 import com.noplanb.domain.character.repository.CharacterRepository;
 import com.noplanb.domain.item.domain.Item;
 import com.noplanb.domain.item.repository.ItemRepository;
+import com.noplanb.domain.item_image.domain.ItemImage;
 import com.noplanb.domain.item_image.domain.repository.ItemImageRepository;
+import com.noplanb.domain.user.domain.User;
 import com.noplanb.domain.user.repository.UserRepository;
 import com.noplanb.global.config.security.token.UserPrincipal;
 import com.noplanb.global.payload.ApiResponse;
@@ -163,18 +165,24 @@ public class CharacterService {
 //        for (ItemImage itemImage : items) {
 //            Item item = Item.builder()
 //                    .character(character)
-//                    .isEquipped(false)
+//                    .isEquipped(false) // 장착 여부 초기화
 //                    .itemImage(itemImage)
 //                    .build();
 //            itemRepository.save(item);
 //        }
 //
 //        // 기본 아이템 장착 (요청값에 따라 다르게 설정)
-//        // 피부색(1->1, 2->2, 3->3) / 눈(1->4, 2->5, 3->6) / 머리(1->7,2->8) / 옷(9,10) 순서
+//        // 피부색(1~3) / 눈(4~6) / 머리(7~9) / 옷(10~11) 순서
 //
 //        List<Long> equippedItemIds = newCharactemReq.getItemIdList();
 //        for (Long equippedItemId : equippedItemIds) {
+//            Item item=itemImageRepository.findById(equippedItemId).map(itemImage -> Item.builder()
+//                    .character(character)
+//                    .isEquipped(true)
+//                    .itemImage(itemImage)
+//                    .build()).orElseThrow(() -> new IllegalArgumentException("아이템을 찾을 수 없습니다."));
 //
+//            itemRepository.save(item);
 //        }
 //
 //        ApiResponse apiResponse = ApiResponse.builder()
