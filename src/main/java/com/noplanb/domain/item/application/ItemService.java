@@ -84,7 +84,7 @@ public class ItemService {
                 .itemName(item.getItemImage().getItemName())
                 .itemType(item.getItemImage().getItemType())
                 // 장착 가능 여부 -> 캐릭터의 레벨이 아이템의 필요 레벨보다 높거나 같으면 장착 가능
-                .ableToEquip(character.getLevel() >= item.getItemImage().getRequiredLevel())
+                .ableToEquip(character.getLevel() >= item.getItemImage().getRequiredLevel()||item.isEquipped())
                 .isEquipped(item.isEquipped())
                 .requiredLevel(item.getItemImage().getRequiredLevel())
                 .build()).toList();
