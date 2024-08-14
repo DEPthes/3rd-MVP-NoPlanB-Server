@@ -8,6 +8,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -19,14 +22,15 @@ public class ItemImage extends BaseEntity {
     private Long id;
     private String itemImageUrl;
 
-    @OneToOne
-    @JoinColumn(name = "item_id")
-    private Item item;
+    private String itemName;
 
-    @Builder
-    public ItemImage(String itemImageUrl, Item item) {
-        this.itemImageUrl = itemImageUrl;
-        this.item = item;
-    }
+    @Enumerated(EnumType.STRING)
+    private ItemType itemType;
+
+    private Long requiredLevel;
+
+    @OneToMany(mappedBy = "itemImage")
+    private List<Item> item = new ArrayList<>();
+
 
 }
