@@ -59,7 +59,7 @@ public class Character extends BaseEntity {
     public void updateCharacterName(String newCharacterName) {
         this.characterName = newCharacterName;
     }
-    public void updateTodayExp(){
+    public void resetTodayExp(){
         this.todayExp = 0l;
 
     }
@@ -74,5 +74,13 @@ public class Character extends BaseEntity {
         this.user = user;
         this.quests = quests;
         this.items = items;
+    }
+  
+    public void updateLevel() {
+        this.level += 1;
+    }
+    public void updateExp(Long exp){
+        this.todayExp += exp;
+        this.totalExp += exp;
     }
 }

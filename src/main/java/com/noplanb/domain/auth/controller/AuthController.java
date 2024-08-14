@@ -33,16 +33,6 @@ public class AuthController {
 
         try {
             return authService.loginWithIdToken(accessToken, email);
-//            Map<String, String> response = new HashMap<>();
-//            response.put("accessToken", loginResponse.getAccessToken());
-//            response.put("refreshToken", loginResponse.getRefreshToken());
-//
-//            ApiResponse apiResponse = ApiResponse.builder()
-//                    .check(true)
-//                    .information(response)
-//                    .build();
-//            return ResponseEntity.ok(apiResponse);
-
         } catch (RuntimeException e) {
             ErrorCode errorCode = ErrorCode.INVALID_TOKEN;
             ErrorResponse errorResponse = ErrorResponse.of(errorCode, e.getMessage());
