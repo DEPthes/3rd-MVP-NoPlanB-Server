@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.noplanb.domain.item.domain.ItemType.*;
+import static com.noplanb.domain.item_image.domain.ItemType.*;
 
 @Service
 @RequiredArgsConstructor
@@ -51,14 +51,14 @@ public class ItemService {
             case "hair":
                 // item_type이 HAIR인 item만 필터링
                 itemList = items.stream()
-                        .filter(item -> item.getItemType().equals(HAIR))
+                        .filter(item -> item.getItemImage().getItemType().equals(HAIR))
                         .toList();
                 break;
 
             case "face":
                 // item_type이 EYE, FACECOLOR인 item만 필터링
                 itemList = items.stream()
-                        .filter(item -> item.getItemType().equals(EYE) || item.getItemType().equals(FACECOLOR))
+                        .filter(item -> item.getItemImage().getItemType().equals(EYE) || item.getItemImage().getItemType().equals(FACECOLOR))
                         .toList();
                 break;
 
@@ -66,27 +66,27 @@ public class ItemService {
             case "fashion":
                 // item_type이 HEAD, GLASSES, CLOTHES인 item만 필터링
                 itemList = items.stream()
-                        .filter(item -> item.getItemType().equals(HEAD) || item.getItemType().equals(GLASSES) || item.getItemType().equals(CLOTHES))
+                        .filter(item -> item.getItemImage().getItemType().equals(HEAD) || item.getItemImage().getItemType().equals(GLASSES) || item.getItemImage().getItemType().equals(CLOTHES))
                         .toList();
                 break;
 
             case "background":
                 // item_type이 BACKGROUND인 item만 필터링
                 itemList = items.stream()
-                        .filter(item -> item.getItemType().equals(BACKGROUND))
+                        .filter(item -> item.getItemImage().getItemType().equals(BACKGROUND))
                         .toList();
                 break;
         }
 
         List<CategoryItemRes> categoryItemRes=itemList.stream().map(item -> CategoryItemRes.builder()
                 .itemId(item.getId())
-                .itemImage(itemImageRepository.findItemImageByItem(item).getItemImageUrl())
-                .itemName(item.getItemName())
-                .itemType(item.getItemType())
+                .itemImage(item.getItemImage().getItemImageUrl())
+                .itemName(item.getItemImage().getItemName())
+                .itemType(item.getItemImage().getItemType())
                 // 장착 가능 여부 -> 캐릭터의 레벨이 아이템의 필요 레벨보다 높거나 같으면 장착 가능
-                .ableToEquip(character.getLevel() >= item.getRequiredLevel())
+                .ableToEquip(character.getLevel() >= item.getItemImage().getRequiredLevel())
                 .isEquipped(item.isEquipped())
-                .requiredLevel(item.getRequiredLevel())
+                .requiredLevel(item.getItemImage().getRequiredLevel())
                 .build()).toList();
 
 

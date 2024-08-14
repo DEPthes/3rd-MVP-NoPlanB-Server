@@ -1,13 +1,17 @@
 package com.noplanb.domain.character.application;
 
 import com.noplanb.domain.character.domain.Character;
+import com.noplanb.domain.character.dto.request.NewCharacterReq;
 import com.noplanb.domain.character.dto.request.UpdateNameReq;
+import com.noplanb.domain.character.dto.response.InitialCharacterInfoRes;
 import com.noplanb.domain.character.dto.response.MyCharacterInfoRes;
 import com.noplanb.domain.character.dto.response.MyCharaterDetailRes;
 import com.noplanb.domain.character.dto.response.MyCharaterListRes;
 import com.noplanb.domain.character.repository.CharacterRepository;
 import com.noplanb.domain.item.domain.Item;
+import com.noplanb.domain.item.repository.ItemRepository;
 import com.noplanb.domain.item_image.domain.repository.ItemImageRepository;
+import com.noplanb.domain.user.repository.UserRepository;
 import com.noplanb.global.config.security.token.UserPrincipal;
 import com.noplanb.global.payload.ApiResponse;
 import com.noplanb.global.payload.Message;
@@ -17,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -27,6 +32,8 @@ public class CharacterService {
 
     private final CharacterRepository characterRepository;
     private final ItemImageRepository itemImageRepository;
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
 
     // 캐릭터 보여주기 메소드
     public MyCharaterListRes getMyCharacterDetail(UserPrincipal userPrincipal) {
@@ -40,8 +47,8 @@ public class CharacterService {
         List<Item> quippedItems = items.stream().filter(Item::isEquipped).toList();
 
         List<MyCharaterDetailRes> myCharaterDetailResList = quippedItems.stream().map(item -> MyCharaterDetailRes.builder()
-                .itemType(item.getItemType())
-                .itemImage((itemImageRepository.findItemImageByItem(item)).getItemImageUrl())
+                .itemType(item.getItemImage().getItemType())
+                .itemImage(item.getItemImage().getItemImageUrl())
                 .build()).toList();
 
         MyCharaterListRes myCharaterListRes = MyCharaterListRes.builder()
@@ -112,4 +119,72 @@ public class CharacterService {
                 .build();
         return ResponseEntity.ok(apiResponse);
     }
+
+    public ResponseEntity<?> getInitialCharacterInfo(UserPrincipal userPrincipal) {
+        Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+
+        // 캐릭터 이름
+        String characterName = character.getCharacterName();
+        // 캐릭터 착장 정보 메소드 사용
+        MyCharaterListRes myCharaterListRes = getMyCharacterDetail(userPrincipal);
+
+        InitialCharacterInfoRes initialCharacterInfoRes = InitialCharacterInfoRes.builder()
+                .characterName(characterName)
+                .myCharaterDetailResList(myCharaterListRes.getMyCharaterDetailResList())
+                .build();
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(initialCharacterInfoRes)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+//
+//    @Transactional
+//    public ResponseEntity<?> createInitialCharacter(UserPrincipal userPrincipal, NewCharacterReq newCharactemReq) {
+//        User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+//        List<ItemImage> items = itemImageRepository.findAll();
+//
+//        // 캐릭터 객체 생성
+//        Character character = Character.builder()
+//                .characterName(newCharactemReq.getCharacterName())
+//                .totalExp(0L)
+//                .totalQuest(0L)
+//                .todayExp(0L)
+//                .level(1L)
+//                .user(user)
+//                .quests(new ArrayList<>())
+//                .items(new ArrayList<>())
+//                .build();
+//        characterRepository.save(character);
+//
+//        // 아이템 객체 생성
+//        for (ItemImage itemImage : items) {
+//            Item item = Item.builder()
+//                    .character(character)
+//                    .isEquipped(false)
+//                    .itemImage(itemImage)
+//                    .build();
+//            itemRepository.save(item);
+//        }
+//
+//        // 기본 아이템 장착 (요청값에 따라 다르게 설정)
+//        // 피부색(1->1, 2->2, 3->3) / 눈(1->4, 2->5, 3->6) / 머리(1->7,2->8) / 옷(9,10) 순서
+//
+//        List<Long> equippedItemIds = newCharactemReq.getItemIdList();
+//        for (Long equippedItemId : equippedItemIds) {
+//
+//        }
+//
+//        ApiResponse apiResponse = ApiResponse.builder()
+//                .check(true)
+//                .information(Message.builder().message("캐릭터가 생성 및 기본 아이템 장착이 완료되었습니다.").build())
+//                .build();
+//
+//        return ResponseEntity.ok(apiResponse);
+//    }
+
+    // 아이템 장착 메소드
+
 }
