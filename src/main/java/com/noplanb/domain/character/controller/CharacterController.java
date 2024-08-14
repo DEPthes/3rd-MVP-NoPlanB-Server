@@ -73,16 +73,16 @@ public class CharacterController {
         return characterService.getInitialCharacterInfo(userPrincipal);
     }
 
-//    @Operation(summary = "캐릭터 생성 API", description = "로그인 직후, 초기 캐릭터를 생성하는 API입니다.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "초기 캐릭터 생성 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Message.class) ) } ),
-//            @ApiResponse(responseCode = "400", description = "초기 캐릭터 생성 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
-//    })
-//    @PostMapping("/initial/character")
-//    public ResponseEntity<?> createInitialCharacter(@Parameter @CurrentUser UserPrincipal userPrincipal, @RequestBody NewCharacterReq newCharactemReq){
-//        return characterService.createInitialCharacter(userPrincipal, newCharactemReq);
-//    }
-//
+    @Operation(summary = "캐릭터 생성 API", description = "로그인 직후, 초기 캐릭터를 생성하는 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "초기 캐릭터 생성 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Message.class) ) } ),
+            @ApiResponse(responseCode = "400", description = "초기 캐릭터 생성 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
+    })
+    @PostMapping("/initial")
+    public ResponseEntity<?> createInitialCharacter(@Parameter @CurrentUser UserPrincipal userPrincipal, @RequestBody NewCharacterReq newCharacterReq){
+        return characterService.createInitialCharacter(userPrincipal, newCharacterReq);
+    }
+
 
 
 
