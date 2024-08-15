@@ -118,6 +118,9 @@ public class QuestService {
                 List<Item> unLockItems = unLockItem(character.getLevel(), character);
                 //해금된 아이템들 이미지 반환
                 List<RetrieveLevelUpItemImage> unLockImages = unLockItems.stream()
+                        //장착하지 않은 아이템들중
+                        .filter(item -> !item.isEquipped())
+                        //이미지를 가져온다.
                         .map(item -> RetrieveLevelUpItemImage.builder()
                                 .itemImageUrl(item.getItemImage().getItemImageUrl())
                                 .build())
