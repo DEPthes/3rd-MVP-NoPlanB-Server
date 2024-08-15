@@ -33,11 +33,13 @@ public class CalendarService {
     private final QuestRepository questRepository;
 
     public ResponseEntity<?> retrieveCalendar(YearMonth date, UserPrincipal userPrincipal) {
+        Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+
         LocalDate startDate = date.atDay(1);
         LocalDate endDate = date.atEndOfMonth();
 
         //그 달의 첫날부터 마지막날까지의 경험치들 가져오기
-        List<DailyExperience> calendarList = dailyExperienceRepository.findByCharacterIdAndDateBetweenOrderByDateAsc(userPrincipal.getId(), startDate, endDate);
+        List<DailyExperience> calendarList = dailyExperienceRepository.findByCharacterIdAndDateBetweenOrderByDateAsc(character.getId(), startDate, endDate);
 
         List<RetrieveCalendarRes> calendarRes = calendarList.stream().
                 map(calendar -> RetrieveCalendarRes.builder()
