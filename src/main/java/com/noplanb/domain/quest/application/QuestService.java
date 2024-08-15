@@ -161,6 +161,7 @@ public class QuestService {
     @Transactional
     @Scheduled(cron = "0 0 0 * * *")
     public void resetDailyExperience() {
+        System.out.println(" 하루 경험치 초기화 함수실행");
         List<Character> characters = characterRepository.findAll();
         for (Character character : characters) {
             // 어제 날짜로 DailyExperience 엔티티에 저장
