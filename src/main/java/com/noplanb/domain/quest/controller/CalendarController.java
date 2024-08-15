@@ -6,6 +6,7 @@ import com.noplanb.domain.quest.dto.res.RetrieveCalendarRes;
 import com.noplanb.global.config.security.token.CurrentUser;
 import com.noplanb.global.config.security.token.UserPrincipal;
 import com.noplanb.global.payload.ErrorResponse;
+import com.noplanb.global.payload.Message;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,7 +32,7 @@ public class CalendarController {
     @GetMapping("/{date}")
     @Operation(summary = "달력 경험치 조회", description = "달력경험치를 조회할 때 사용하는 API")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "달력 조회 성공", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RetrieveCalendarRes.class))}),
+            @ApiResponse(responseCode = "200", description = "달력 조회 성공", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Message.class))}),
             @ApiResponse(responseCode = "400", description = "달력 조회 실패", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     public ResponseEntity<?> retrieveCalendar(
