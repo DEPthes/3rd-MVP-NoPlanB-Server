@@ -1,8 +1,10 @@
 package com.noplanb.domain.quest.controller;
 
+
 import com.noplanb.domain.quest.application.QuestService;
 import com.noplanb.domain.quest.dto.req.CreateQuestReq;
 import com.noplanb.domain.quest.dto.req.ModifyQuestReq;
+import com.noplanb.domain.quest.dto.res.RetrieveCompleteQuest;
 import com.noplanb.domain.quest.dto.res.RetrieveLevelAndTodayExpRes;
 import com.noplanb.domain.quest.dto.res.RetrieveQuestRes;
 import com.noplanb.global.config.security.token.CurrentUser;
@@ -67,7 +69,7 @@ public class QuestController {
     @PostMapping("/{id}")
     @Operation(summary = "퀘스트 완료", description = "퀘스트 완료할 때 사용하는 API")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "퀘스트 완료 성공", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Message.class))}),
+            @ApiResponse(responseCode = "200", description = "퀘스트 완료 성공", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RetrieveCompleteQuest.class))}),
             @ApiResponse(responseCode = "400", description = "퀘스트 완료 실패", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     public ResponseEntity<?> completeQuest(
