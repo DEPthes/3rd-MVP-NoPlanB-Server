@@ -20,6 +20,7 @@ import com.noplanb.global.payload.Message;
 import com.noplanb.global.payload.exception.CharacterNotFoundException;
 import com.noplanb.global.payload.exception.QuestNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class QuestService {
     private final CharacterRepository characterRepository;
     private final QuestRepository questRepository;
@@ -172,9 +174,9 @@ public class QuestService {
         return createApiResponse(Message.builder().message("퀘스트를 삭제했습니다.").build());
     }
     @Transactional
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 0 * * *",zone = "Asia/Seoul")
     public void resetDailyExperience() {
-        System.out.println(" 하루 경험치 초기화 함수실행");
+        log.info(" 하루 경험치 초기화 함수실행");
         List<Character> characters = characterRepository.findAll();
         for (Character character : characters) {
             // 어제 날짜로 DailyExperience 엔티티에 저장
