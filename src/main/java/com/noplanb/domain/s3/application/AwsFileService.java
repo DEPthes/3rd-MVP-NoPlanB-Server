@@ -71,62 +71,8 @@ public class AwsFileService {
             }
             return Optional.of(convertFile);
         } else {
-        log.error("Failed to create new file: " + convertFile.getAbsolutePath());
-    }
+            log.error("Failed to create new file: " + convertFile.getAbsolutePath());
+        }
         return Optional.empty();
     }
-
-    public void createDir(String bucketName, String folderName) {
-        amazonS3Client.putObject(bucketName, folderName + "/", new ByteArrayInputStream(new byte[0]), new ObjectMetadata());
-    }
-//    public void deleteImage(String dirName, String imageUrl) {
-//        String fileName = extractFileNameFromUrl(imageUrl);
-//
-//        if (fileName != null) {
-//            try {
-//                fileName = URLDecoder.decode(fileName, "UTF-8");
-//            } catch (Exception e) {
-//                log.error("파일명 디코딩 중 오류 발생", e);
-//                return;
-//            }
-//
-//            // 디렉토리명과 파일명을 조합하여 전체 객체 키 생성
-//            String objectKey = dirName + "/" + fileName;
-//
-//            // S3 파일 확인
-//            if (isS3FileExists(objectKey)) {
-//                amazonS3Client.deleteObject(bucket, objectKey);
-//                log.info("S3 이미지 삭제가 완료되었습니다. 파일명: {}", objectKey);
-//
-//            } else {
-//                log.warn("S3에 해당 파일이 존재하지 않습니다. 파일명: {}", objectKey);
-//            }
-//
-//        } else {
-//            log.warn("유효하지 않은 S3 이미지 URL입니다. URL: {}", imageUrl);
-//        }
-//
-//    }
-
-    // S3에 해당 파일이 존재하는지 확인
-//    private boolean isS3FileExists(String fileName) {
-//        try {
-//            ObjectMetadata objectMetadata = amazonS3Client.getObjectMetadata(bucket, fileName);
-//            return true;
-//        } catch (AmazonS3Exception e) {
-//            if (e.getStatusCode() == 404) {
-//                return false; // 파일이 존재하지 않음
-//            } else {
-//                throw e; // 다른 예외는 다시 던짐
-//            }
-//        }
-//    }
-//
-//    private String extractFileNameFromUrl(String imageUrl) {
-//        try {
-//            return imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
-//        } catch (Exception e) {
-//            return null;
-//        }
-//    }
 }

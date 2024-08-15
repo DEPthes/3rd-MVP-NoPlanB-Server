@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,6 +44,7 @@ public class QuestService {
         Character character = characterRepository.findById(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
 
         Quest quest = Quest.builder()
+                .createdTime(LocalDateTime.now())
                 .contents(createQuestReq.getContents())
                 .exp(createQuestReq.getExp())
                 .character(character)
@@ -60,9 +62,9 @@ public class QuestService {
         List<Quest> quests = character.getQuests();
         // 특정 날짜에 해당하는 퀘스트 필터링 후 미완료 완료 로 정렬 후 생성순으로 정렬
         List<RetrieveQuestRes> retrieveQuestResList = quests.stream()
-                .filter(quest -> quest.getCreatedAt().toLocalDate().isEqual(localDate))
+                .filter(quest -> quest.getCreatedTime().toLocalDate().isEqual(localDate))
                 .sorted(Comparator.comparing(Quest::getIsComplete)
-                        .thenComparing(Quest::getCreatedAt))
+                        .thenComparing(Quest::getCreatedTime))
                 .map(quest -> RetrieveQuestRes.builder()
                         .id(quest.getId())
                         .contents(quest.getContents())
@@ -114,7 +116,7 @@ public class QuestService {
                 //해금된 아이템들 이미지 반환
                 List<RetrieveLevelUpItemImage> unLockImages = unLockItems.stream()
                         .map(item -> RetrieveLevelUpItemImage.builder()
-                                .itemImageUrl(itemImageRepository.findItemImageByItem(item).getItemImageUrl())
+                                .itemImageUrl(item.getItemImage().getItemImageUrl())
                                 .build())
                         .collect(Collectors.toList());
                 return createApiResponse(unLockImages);
@@ -159,6 +161,7 @@ public class QuestService {
     @Transactional
     @Scheduled(cron = "0 0 0 * * *")
     public void resetDailyExperience() {
+        System.out.println(" 하루 경험치 초기화 함수실행");
         List<Character> characters = characterRepository.findAll();
         for (Character character : characters) {
             // 어제 날짜로 DailyExperience 엔티티에 저장
