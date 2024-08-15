@@ -1,4 +1,4 @@
-package com.noplanb.domain.item.domain;
+package com.noplanb.domain.item_image.domain;
 
 public enum ItemType {
     // 카테고리-헤어

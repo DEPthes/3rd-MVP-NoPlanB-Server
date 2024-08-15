@@ -7,6 +7,7 @@ import com.noplanb.domain.quest.domain.Quest;
 import com.noplanb.domain.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -63,6 +64,18 @@ public class Character extends BaseEntity {
 
     }
 
+    @Builder
+    public Character(String characterName, Long totalExp, Long totalQuest, Long todayExp, Long level, User user, List<Quest> quests, List<Item> items) {
+        this.characterName = characterName;
+        this.totalExp = totalExp;
+        this.totalQuest = totalQuest;
+        this.todayExp = todayExp;
+        this.level = level;
+        this.user = user;
+        this.quests = quests;
+        this.items = items;
+    }
+  
     public void updateLevel() {
         this.level += 1;
     }

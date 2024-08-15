@@ -128,7 +128,7 @@ public class QuestService {
 
     private List<Item> unLockItem(Long level, Character character) {
         List<Item> items = character.getItems();
-        List<Item> lockItems = items.stream().filter(item -> item.getRequiredLevel().equals(level))
+        List<Item> lockItems = items.stream().filter(item -> item.getItemImage().getRequiredLevel().equals(level))
                 .collect(Collectors.toList());
         return lockItems;
 

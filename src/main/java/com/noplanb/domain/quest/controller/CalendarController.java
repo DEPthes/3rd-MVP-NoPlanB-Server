@@ -25,7 +25,7 @@ import java.time.YearMonth;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/calendar")
-@Tag(name = "CalendarController", description = "CalendarController입니다.")
+@Tag(name = "Calendar", description = "캘린더 관련 API")
 public class CalendarController {
     private final CalendarService calendarService;
     @GetMapping("/{date}")
