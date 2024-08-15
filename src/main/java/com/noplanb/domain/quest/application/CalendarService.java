@@ -55,7 +55,7 @@ public class CalendarService {
     }
     @Transactional
     public ResponseEntity<?> createQuestAfterToday(CreateQuestAfterTodayReq createQuestAfterTodayReq, UserPrincipal userPrincipal) {
-        Character character = characterRepository.findById(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
+        Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
         //미리 추가하는 경우는 자정으로 설정한다.
         LocalDateTime dateTimeAtMidnight = createQuestAfterTodayReq.getDate().atStartOfDay();
         Quest quest = Quest.builder()

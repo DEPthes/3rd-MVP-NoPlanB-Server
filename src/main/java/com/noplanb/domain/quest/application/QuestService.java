@@ -14,6 +14,7 @@ import com.noplanb.domain.quest.dto.res.RetrieveLevelUpItemImage;
 import com.noplanb.domain.quest.dto.res.RetrieveQuestRes;
 import com.noplanb.domain.quest.repository.DailyExperienceRepository;
 import com.noplanb.domain.quest.repository.QuestRepository;
+import com.noplanb.domain.user.repository.UserRepository;
 import com.noplanb.global.config.security.token.UserPrincipal;
 import com.noplanb.global.payload.ApiResponse;
 import com.noplanb.global.payload.Message;
@@ -38,10 +39,11 @@ public class QuestService {
     private final QuestRepository questRepository;
     private final DailyExperienceRepository dailyExperienceRepository;
     private final ItemImageRepository itemImageRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public ResponseEntity<?> createQuest(CreateQuestReq createQuestReq, UserPrincipal userPrincipal) {
-        Character character = characterRepository.findById(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
+        Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
 
         Quest quest = Quest.builder()
                 .createdTime(LocalDateTime.now())
@@ -58,7 +60,8 @@ public class QuestService {
         return createApiResponse((Message.builder().message("퀘스트를 만들었습니다.").build()));
     }
     public ResponseEntity<?> retrieveQuest(LocalDate localDate, UserPrincipal userPrincipal) {
-        Character character = characterRepository.findById(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
+        System.out.println("userPrincipal = " + userPrincipal.getId());
+        Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
         List<Quest> quests = character.getQuests();
         // 특정 날짜에 해당하는 퀘스트 필터링 후 미완료 완료 로 정렬 후 생성순으로 정렬
         List<RetrieveQuestRes> retrieveQuestResList = quests.stream()
@@ -77,7 +80,7 @@ public class QuestService {
     }
 
     public ResponseEntity<?> retrieveLevelAndTodayExp(UserPrincipal userPrincipal) {
-        Character character = characterRepository.findById(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
+        Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
         Long level = character.getLevel();
         Long acquireExp = character.getTotalExp() - (((level-1)*level)/2)*10;
 
@@ -92,7 +95,7 @@ public class QuestService {
     }
     @Transactional
     public ResponseEntity<?> completeQuest(UserPrincipal userPrincipal, Long id) {
-        Character character = characterRepository.findById(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
+        Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
         Long characterLevel = character.getLevel();
         List<Quest> quests = character.getQuests();
         // 퀘스트 가져오기
@@ -136,7 +139,8 @@ public class QuestService {
 
     @Transactional
     public ResponseEntity<?> modifyQuest(UserPrincipal userPrincipal, ModifyQuestReq modifyQuestReq) {
-        Character character = characterRepository.findById(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
+        Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
+        System.out.println("character.getCharacterName() = " + character.getCharacterName());
         List<Quest> quests = character.getQuests();
         // 퀘스트 가져오기
         Quest quest = quests.stream().filter(q -> q.getId().equals(modifyQuestReq.getId()))
@@ -148,7 +152,7 @@ public class QuestService {
     }
     @Transactional
     public ResponseEntity<?> deleteQuest(UserPrincipal userPrincipal, Long id) {
-        Character character = characterRepository.findById(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
+        Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
         List<Quest> quests = character.getQuests();
 
         Quest quest = quests.stream().filter(q -> q.getId().equals(id))
