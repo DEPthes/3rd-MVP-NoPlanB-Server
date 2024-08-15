@@ -27,7 +27,7 @@ import java.time.LocalDate;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/quest")
-@Tag(name = "QuestController", description = "QuestController입니다.")
+@Tag(name = "Quest", description = "퀘스트 관련 API")
 public class QuestController {
     private final QuestService questService;
 

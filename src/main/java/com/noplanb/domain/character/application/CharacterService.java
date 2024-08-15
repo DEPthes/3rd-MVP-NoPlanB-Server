@@ -2,6 +2,7 @@ package com.noplanb.domain.character.application;
 
 import com.noplanb.domain.character.domain.Character;
 // import com.noplanb.domain.character.dto.request.NewCharacterReq;
+import com.noplanb.domain.character.dto.request.NewCharacterReq;
 import com.noplanb.domain.character.dto.request.UpdateNameReq;
 import com.noplanb.domain.character.dto.response.InitialCharacterInfoRes;
 import com.noplanb.domain.character.dto.response.MyCharacterInfoRes;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -142,57 +144,56 @@ public class CharacterService {
 
         return ResponseEntity.ok(apiResponse);
     }
-//
-//    @Transactional
-//    public ResponseEntity<?> createInitialCharacter(UserPrincipal userPrincipal, NewCharacterReq newCharactemReq) {
-//        User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-//        List<ItemImage> items = itemImageRepository.findAll();
-//
-//        // 캐릭터 객체 생성
-//        Character character = Character.builder()
-//                .characterName(newCharactemReq.getCharacterName())
-//                .totalExp(0L)
-//                .totalQuest(0L)
-//                .todayExp(0L)
-//                .level(1L)
-//                .user(user)
-//                .quests(new ArrayList<>())
-//                .items(new ArrayList<>())
-//                .build();
-//        characterRepository.save(character);
-//
-//        // 아이템 객체 생성
-//        for (ItemImage itemImage : items) {
-//            Item item = Item.builder()
-//                    .character(character)
-//                    .isEquipped(false) // 장착 여부 초기화
-//                    .itemImage(itemImage)
-//                    .build();
-//            itemRepository.save(item);
-//        }
-//
-//        // 기본 아이템 장착 (요청값에 따라 다르게 설정)
-//        // 피부색(1~3) / 눈(4~6) / 머리(7~9) / 옷(10~11) 순서
-//
-//        List<Long> equippedItemIds = newCharactemReq.getItemIdList();
-//        for (Long equippedItemId : equippedItemIds) {
-//            Item item=itemImageRepository.findById(equippedItemId).map(itemImage -> Item.builder()
-//                    .character(character)
-//                    .isEquipped(true)
-//                    .itemImage(itemImage)
-//                    .build()).orElseThrow(() -> new IllegalArgumentException("아이템을 찾을 수 없습니다."));
-//
-//            itemRepository.save(item);
-//        }
-//
-//        ApiResponse apiResponse = ApiResponse.builder()
-//                .check(true)
-//                .information(Message.builder().message("캐릭터가 생성 및 기본 아이템 장착이 완료되었습니다.").build())
-//                .build();
-//
-//        return ResponseEntity.ok(apiResponse);
-//    }
 
-    // 아이템 장착 메소드
+    @Transactional
+    public ResponseEntity<?> createInitialCharacter(UserPrincipal userPrincipal, NewCharacterReq newCharacterReq) {
+        User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        List<ItemImage> items = itemImageRepository.findAll();
+
+        // 캐릭터 객체 생성
+        Character character = Character.builder()
+                .characterName(newCharacterReq.getCharacterName())
+                .totalExp(0L)
+                .totalQuest(0L)
+                .todayExp(0L)
+                .level(1L)
+                .user(user)
+                .quests(new ArrayList<>())
+                .items(new ArrayList<>())
+                .build();
+        characterRepository.save(character);
+
+        // 아이템 객체 생성 및 저장
+        List<Item> itemList = new ArrayList<>();
+        for (ItemImage itemImage : items) {
+            Item item = Item.builder()
+                    .character(character)
+                    .isEquipped(false) // 장착 여부 초기화
+                    .itemImage(itemImage)
+                    .build();
+            itemList.add(item);
+        }
+        itemRepository.saveAll(itemList);
+
+        // 기본 아이템 장착 (요청값에 따라 다르게 설정)
+        // 피부색(1~3) / 눈(4~6) / 머리(7~9) / 옷(10~11) 순서
+        // 장착할 아이템 ID = 아이템 이미지의 ID
+
+        for (Long equippedItemId : newCharacterReq.getItemIdList()) {
+            Item item = itemList.stream()
+                    .filter(i -> i.getItemImage().getId().equals(equippedItemId))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("아이템을 찾을 수 없습니다."));
+            item.updateEquipped(true);
+        }
+        itemRepository.saveAll(itemList); // 변경사항 저장
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(Message.builder().message("캐릭터가 생성 및 기본 아이템 장착이 완료되었습니다.").build())
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
 
 }

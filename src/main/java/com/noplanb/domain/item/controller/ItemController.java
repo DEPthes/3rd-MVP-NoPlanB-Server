@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/items")
-@Tag(name = "ItemController", description = "ItemControllerController입니다.")
+@Tag(name = "Item", description = "아이템 관련 API")
 public class ItemController {
 
     private final ItemService itemService;
