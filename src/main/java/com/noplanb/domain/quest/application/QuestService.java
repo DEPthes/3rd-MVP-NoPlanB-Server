@@ -116,7 +116,7 @@ public class QuestService {
                 //해금된 아이템들 이미지 반환
                 List<RetrieveLevelUpItemImage> unLockImages = unLockItems.stream()
                         .map(item -> RetrieveLevelUpItemImage.builder()
-                                .itemImageUrl(itemImageRepository.findItemImageByItem(item).getItemImageUrl())
+                                .itemImageUrl(item.getItemImage().getItemImageUrl())
                                 .build())
                         .collect(Collectors.toList());
                 return createApiResponse(unLockImages);
