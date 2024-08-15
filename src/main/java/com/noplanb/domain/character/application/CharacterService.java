@@ -2,6 +2,8 @@ package com.noplanb.domain.character.application;
 
 import com.noplanb.domain.character.domain.Character;
 // import com.noplanb.domain.character.dto.request.NewCharacterReq;
+import com.noplanb.domain.character.dto.request.MyCharacterEquipItemDetailReq;
+import com.noplanb.domain.character.dto.request.MyCharacterEquipItemReq;
 import com.noplanb.domain.character.dto.request.NewCharacterReq;
 import com.noplanb.domain.character.dto.request.UpdateNameReq;
 import com.noplanb.domain.character.dto.response.InitialCharacterInfoRes;
@@ -12,6 +14,7 @@ import com.noplanb.domain.character.repository.CharacterRepository;
 import com.noplanb.domain.item.domain.Item;
 import com.noplanb.domain.item.repository.ItemRepository;
 import com.noplanb.domain.item_image.domain.ItemImage;
+import com.noplanb.domain.item_image.domain.ItemType;
 import com.noplanb.domain.item_image.domain.repository.ItemImageRepository;
 import com.noplanb.domain.user.domain.User;
 import com.noplanb.domain.user.repository.UserRepository;
@@ -196,4 +199,46 @@ public class CharacterService {
         return ResponseEntity.ok(apiResponse);
     }
 
+
+    public ResponseEntity<?> myCharacterEquipItem(UserPrincipal userPrincipal, MyCharacterEquipItemReq myCharacterEquipItemReq) {
+        Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+        List<Item> item = character.getItems();
+        // 캐릭터의 아이템 리스트
+        List<MyCharacterEquipItemDetailReq> itemIdList = myCharacterEquipItemReq.getMyCharacterEquipItemDetailReqList();
+
+        // 캐릭터의 아이템 리스트 중 장착 여부를 변경할 아이템 찾기 (아이템 타입, 아이템 id)
+        // 해당 타입의 기존 장착 아이템은 장착 해제
+
+        for (MyCharacterEquipItemDetailReq myCharacterEquipItemDetailReq : itemIdList) {
+            ItemType itemType = myCharacterEquipItemDetailReq.getItemType();
+            Long itemId = myCharacterEquipItemDetailReq.getItemId();
+
+//            // 장착 해제할 아이템 찾기 후 isEquipped = false로 변경
+//            Item itemToUnequip = item.stream()
+//                    .filter(i -> i.getItemImage().getItemType().equals(itemType) && i.isEquipped())
+//                    .findFirst()
+//                    .orElseThrow(() -> new IllegalArgumentException("장착 해제할 아이템을 찾을 수 없습니다."));
+//            itemToUnequip.updateEquipped(false);
+
+            // 모든 아이템 장착 상태를 isEquipped = false로 초기화
+            for (Item i : item) {
+                i.updateEquipped(false);
+            }
+
+            // 장착할 아이템 isEquipped = true로 변경
+            Item itemToEquip = item.stream()
+                    .filter(i -> i.getItemImage().getId().equals(itemId))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("장착할 아이템을 찾을 수 없습니다."));
+            itemToEquip.updateEquipped(true);
+
+        }
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(Message.builder().message("아이템 장착이 완료되었습니다.").build())
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
 }

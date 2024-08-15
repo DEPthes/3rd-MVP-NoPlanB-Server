@@ -1,6 +1,7 @@
 package com.noplanb.domain.character.controller;
 
 import com.noplanb.domain.character.application.CharacterService;
+import com.noplanb.domain.character.dto.request.MyCharacterEquipItemReq;
 import com.noplanb.domain.character.dto.request.NewCharacterReq;
 import com.noplanb.domain.character.dto.request.UpdateNameReq;
 import com.noplanb.domain.character.dto.response.InitialCharacterInfoRes;
@@ -83,9 +84,14 @@ public class CharacterController {
         return characterService.createInitialCharacter(userPrincipal, newCharacterReq);
     }
 
-
-
-
-
+    @Operation(summary = "캐릭터 아이템 장착 API", description = "캐릭터가 아이템을 장착하는 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "아이템 장착 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Message.class) ) } ),
+            @ApiResponse(responseCode = "400", description = "아이템 장착 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
+    })
+    @PostMapping("/equip")
+    public ResponseEntity<?> equipItem(@Parameter @CurrentUser UserPrincipal userPrincipal, @RequestParam MyCharacterEquipItemReq myCharacterEquipItemReq){
+        return characterService.myCharacterEquipItem(userPrincipal, myCharacterEquipItemReq);
+    }
 
 }
