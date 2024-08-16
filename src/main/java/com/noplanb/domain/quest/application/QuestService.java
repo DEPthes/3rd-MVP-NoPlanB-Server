@@ -60,7 +60,6 @@ public class QuestService {
         return createApiResponse((Message.builder().message("퀘스트를 만들었습니다.").build()));
     }
     public ResponseEntity<?> retrieveQuest(LocalDate localDate, UserPrincipal userPrincipal) {
-        System.out.println("userPrincipal = " + userPrincipal.getId());
         Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
         List<Quest> quests = character.getQuests();
         // 특정 날짜에 해당하는 퀘스트 필터링 후 미완료 완료 로 정렬 후 생성순으로 정렬
