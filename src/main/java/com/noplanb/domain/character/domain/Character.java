@@ -83,4 +83,8 @@ public class Character extends BaseEntity {
         this.todayExp += exp;
         this.totalExp += exp;
     }
+
+    public void updateTotalQuest() {
+        this.totalQuest += 1;
+    }
 }

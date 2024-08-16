@@ -3,14 +3,13 @@ package com.noplanb.domain.quest.application;
 import com.noplanb.domain.character.domain.Character;
 import com.noplanb.domain.character.repository.CharacterRepository;
 import com.noplanb.domain.item.domain.Item;
-import com.noplanb.domain.item_image.domain.ItemImage;
 import com.noplanb.domain.item_image.domain.repository.ItemImageRepository;
 import com.noplanb.domain.quest.domain.DailyExperience;
 import com.noplanb.domain.quest.domain.Quest;
 import com.noplanb.domain.quest.dto.req.CreateQuestReq;
 import com.noplanb.domain.quest.dto.req.ModifyQuestReq;
 import com.noplanb.domain.quest.dto.res.RetrieveLevelAndTodayExpRes;
-import com.noplanb.domain.quest.dto.res.RetrieveLevelUpItemImage;
+import com.noplanb.domain.quest.dto.res.RetrieveCompleteQuest;
 import com.noplanb.domain.quest.dto.res.RetrieveQuestRes;
 import com.noplanb.domain.quest.repository.DailyExperienceRepository;
 import com.noplanb.domain.quest.repository.QuestRepository;
@@ -21,6 +20,7 @@ import com.noplanb.global.payload.Message;
 import com.noplanb.global.payload.exception.CharacterNotFoundException;
 import com.noplanb.global.payload.exception.QuestNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -28,18 +28,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class QuestService {
     private final CharacterRepository characterRepository;
     private final QuestRepository questRepository;
     private final DailyExperienceRepository dailyExperienceRepository;
-    private final ItemImageRepository itemImageRepository;
-    private final UserRepository userRepository;
 
     @Transactional
     public ResponseEntity<?> createQuest(CreateQuestReq createQuestReq, UserPrincipal userPrincipal) {
@@ -105,28 +105,39 @@ public class QuestService {
 
         //퀘스트 완료처리
         quest.updateIsComplete(Boolean.TRUE);
+        //총 퀘스트 개수 1개 추가
+        character.updateTotalQuest();
         //오늘얻은 경험치 update
         character.updateExp(quest.getExp());
 
+        List<String> itemImageUrls = new ArrayList<>();
+        String questType = "완료";
+
         // 레벨업 확인
         if (character.getTotalExp()>((characterLevel*(characterLevel+1)/2)*10)){
+            questType = "레벨업";
             // 레벨업
             character.updateLevel();
             // 레벌업된 레벨이 해금대상인지 확인
             if (character.getLevel() % 5 == 0) {
+                questType = "해금";
                 //아이템 해금
                 List<Item> unLockItems = unLockItem(character.getLevel(), character);
                 //해금된 아이템들 이미지 반환
-                List<RetrieveLevelUpItemImage> unLockImages = unLockItems.stream()
-                        .map(item -> RetrieveLevelUpItemImage.builder()
-                                .itemImageUrl(item.getItemImage().getItemImageUrl())
-                                .build())
+                itemImageUrls = unLockItems.stream()
+                        //장착하지 않은 아이템들중
+                        .filter(item -> !item.isEquipped())
+                        //이미지를 가져온다.
+                        .map(item -> item.getItemImage().getItemImageUrl())
                         .collect(Collectors.toList());
-                return createApiResponse(unLockImages);
             }
-            return createApiResponse(Message.builder().message("레벨업을 했습니다!").build());
         }
-        return createApiResponse(Message.builder().message("퀘스트를 완료했습니다!").build());
+
+        RetrieveCompleteQuest retrieveCompleteQuest = RetrieveCompleteQuest.builder()
+                .questType(questType)
+                .itemImageUrls(itemImageUrls)
+                .build();
+        return createApiResponse(retrieveCompleteQuest);
     }
 
     private List<Item> unLockItem(Long level, Character character) {
@@ -163,9 +174,9 @@ public class QuestService {
         return createApiResponse(Message.builder().message("퀘스트를 삭제했습니다.").build());
     }
     @Transactional
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 0 * * *",zone = "Asia/Seoul")
     public void resetDailyExperience() {
-        System.out.println(" 하루 경험치 초기화 함수실행");
+        log.info(" 하루 경험치 초기화 함수실행");
         List<Character> characters = characterRepository.findAll();
         for (Character character : characters) {
             // 어제 날짜로 DailyExperience 엔티티에 저장
