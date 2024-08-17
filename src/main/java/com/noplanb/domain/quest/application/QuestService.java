@@ -113,7 +113,7 @@ public class QuestService {
         String questType = "완료";
 
         // 레벨업 확인
-        if (character.getTotalExp()>((characterLevel*(characterLevel+1)/2)*10)){
+        if (character.getTotalExp()>=(((characterLevel*(characterLevel+1))/2)*10)){
             questType = "레벨업";
             // 레벨업
             character.updateLevel();
