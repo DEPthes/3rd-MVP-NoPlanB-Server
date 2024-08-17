@@ -25,7 +25,6 @@ public class NoPlanBApplication {
     }
     @PostConstruct
     public void init() {
-        System.out.println("true = " + true);
         // timezone 설정
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
     }
