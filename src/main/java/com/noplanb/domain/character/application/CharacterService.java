@@ -199,6 +199,7 @@ public class CharacterService {
     }
 
 
+    @Transactional
     public ResponseEntity<?> myCharacterEquipItem(UserPrincipal userPrincipal, MyCharacterEquipItemReq myCharacterEquipItemReq) {
         Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
         List<Item> item = character.getItems();
@@ -219,6 +220,7 @@ public class CharacterService {
 
             Item equitItem = (Item) itemRepository.findById(itemId).orElseThrow(()->new IllegalArgumentException("아이템을 찾을 수 없습니다."));
             equitItem.updateEquipped(true);
+
 
 //            // 장착 해제할 아이템 찾기 후 isEquipped = false로 변경
 //            Item itemToUnequip = item.stream()
