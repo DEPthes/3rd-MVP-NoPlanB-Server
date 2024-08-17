@@ -150,7 +150,6 @@ public class QuestService {
     @Transactional
     public ResponseEntity<?> modifyQuest(UserPrincipal userPrincipal, ModifyQuestReq modifyQuestReq) {
         Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
-        System.out.println("character.getCharacterName() = " + character.getCharacterName());
         List<Quest> quests = character.getQuests();
         // 퀘스트 가져오기
         Quest quest = quests.stream().filter(q -> q.getId().equals(modifyQuestReq.getId()))
