@@ -90,7 +90,7 @@ public class CharacterController {
             @ApiResponse(responseCode = "400", description = "아이템 장착 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
     })
     @PostMapping("/equip")
-    public ResponseEntity<?> equipItem(@Parameter @CurrentUser UserPrincipal userPrincipal, @RequestParam MyCharacterEquipItemReq myCharacterEquipItemReq){
+    public ResponseEntity<?> equipItem(@Parameter @CurrentUser UserPrincipal userPrincipal, @RequestBody MyCharacterEquipItemReq myCharacterEquipItemReq){
         return characterService.myCharacterEquipItem(userPrincipal, myCharacterEquipItemReq);
     }
 
