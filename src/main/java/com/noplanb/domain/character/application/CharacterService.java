@@ -53,6 +53,7 @@ public class CharacterService {
         List<Item> quippedItems = items.stream().filter(Item::isEquipped).toList();
 
         List<MyCharaterDetailRes> myCharaterDetailResList = quippedItems.stream().map(item -> MyCharaterDetailRes.builder()
+                .itemId(item.getId())
                 .itemType(item.getItemImage().getItemType())
                 .itemImage(item.getItemImage().getItemImageUrl())
                 .build()).toList();
