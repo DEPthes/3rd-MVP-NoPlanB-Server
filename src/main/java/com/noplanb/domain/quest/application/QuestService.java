@@ -28,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -79,8 +81,25 @@ public class QuestService {
     }
 
     public ResponseEntity<?> retrieveLevelAndTodayExp(UserPrincipal userPrincipal) {
+        // 오늘의 날짜 가져오기
+        LocalDate today = LocalDate.now();
+
+        // 오늘의 시작(LocalDateTime)과 끝(LocalDateTime) 설정
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+
         Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
+        // 오늘 만든 퀘스트들 가져오기
+        List<Quest> todayQuests = questRepository.findByCharacterIdAndCreatedTimeBetween(character.getId(), startOfDay, endOfDay);
+
+        Long totQuestExp = 0L;
+        // 오늘 만든 퀘스트들의 경험치가져오기
+        for (Quest todayQuest : todayQuests) {
+            totQuestExp += todayQuest.getExp();
+        }
+        // 레벨
         Long level = character.getLevel();
+        // 지금레벨에서 다음레벨까지 필요한 경험치
         Long acquireExp = character.getTotalExp() - (((level-1)*level)/2)*10;
 
         RetrieveLevelAndTodayExpRes retrieveLevelAndTodayExpRes = RetrieveLevelAndTodayExpRes.builder()
@@ -88,6 +107,7 @@ public class QuestService {
                 .acquireExp(acquireExp)
                 .needExp(level*10)
                 .todayExp(character.getTodayExp())
+                .totQuestExp(totQuestExp)
                 .build();
 
         return createApiResponse(retrieveLevelAndTodayExpRes);

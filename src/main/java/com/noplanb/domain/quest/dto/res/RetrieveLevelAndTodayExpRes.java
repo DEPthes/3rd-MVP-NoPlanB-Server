@@ -15,5 +15,7 @@ public class RetrieveLevelAndTodayExpRes {
     private Long needExp;
     @Schema(type = "Long", example = "5", description = "오늘 얻은 경험치")
     private Long todayExp;
+    @Schema(type = "Long", example = "3", description = "생성된 퀘스트들의 경험치 합")
+    private Long totQuestExp;
 
 }
