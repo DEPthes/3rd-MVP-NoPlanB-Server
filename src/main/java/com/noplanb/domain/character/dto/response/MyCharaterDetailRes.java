@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class MyCharaterDetailRes {
+    @Schema(type = "Long", example = "10", description = "아이템 ID")
+    private Long itemId;
     @Schema(type = "string", example = "HEAD", description = "아이템 타입")
     private ItemType itemType;
     @Schema(type = "string", example = "모자1.png", description = "아이템 이미지")
