@@ -3,6 +3,7 @@ package com.noplanb.domain.user.controller;
 import com.amazonaws.Response;
 import com.noplanb.domain.user.application.UserService;
 import com.noplanb.domain.user.dto.response.MyAccountRes;
+import com.noplanb.domain.user.dto.response.UserCharacterExistRes;
 import com.noplanb.global.config.security.token.CurrentUser;
 import com.noplanb.global.config.security.token.UserPrincipal;
 import com.noplanb.global.payload.ErrorResponse;
@@ -38,4 +39,13 @@ public class UserController {
         return userService.getMyAccount(userPrincipal);
     }
 
+    @Operation(summary = "유저 캐릭터 생성 여부 조회 API", description = "유저의 캐릭터 생성 여부를 조회하는 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "캐릭터 생성 여부 조회 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = UserCharacterExistRes.class) ) } ),
+            @ApiResponse(responseCode = "400", description = "캐릭터 생성 여부 조회 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
+    })
+    @GetMapping("/character-exist")
+    public ResponseEntity<?> getUserCharacterExist(@Parameter @CurrentUser UserPrincipal userPrincipal){
+        return userService.getUserCharacterExist(userPrincipal);
+    }
 }
