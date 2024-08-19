@@ -12,6 +12,7 @@ public enum ItemType {
     HEAD, // 모자
     GLASSES, // 안경
     CLOTHES, // 옷
+    ETC, // 기타
 
     // 카테고리 - 배경
     BACKGROUND //배경
