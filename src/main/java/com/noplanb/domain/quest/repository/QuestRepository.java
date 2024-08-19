@@ -11,4 +11,5 @@ import java.util.List;
 @Repository
 public interface QuestRepository extends JpaRepository<Quest,Long> {
     List<Quest> findByCharacterIdAndCreatedTimeBetween(Long id, LocalDateTime startOfDay, LocalDateTime endOfDay);
+    void deleteByCharacterIdAndCreatedTimeBetween(Long id, LocalDateTime startOfDay, LocalDateTime endOfDay);
 }

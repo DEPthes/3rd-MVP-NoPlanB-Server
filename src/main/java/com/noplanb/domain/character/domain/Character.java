@@ -87,4 +87,10 @@ public class Character extends BaseEntity {
     public void updateTotalQuest() {
         this.totalQuest += 1;
     }
+    public void initCharacter(){
+        this.totalExp = 0l;
+        this.todayExp = 0l;
+        this.level = 1l;
+        this.totalQuest = 0l;
+    }
 }
