@@ -16,17 +16,22 @@ import com.noplanb.domain.item.repository.ItemRepository;
 import com.noplanb.domain.item_image.domain.ItemImage;
 import com.noplanb.domain.item_image.domain.ItemType;
 import com.noplanb.domain.item_image.domain.repository.ItemImageRepository;
+import com.noplanb.domain.quest.domain.Quest;
+import com.noplanb.domain.quest.repository.QuestRepository;
 import com.noplanb.domain.user.domain.User;
 import com.noplanb.domain.user.repository.UserRepository;
 import com.noplanb.global.config.security.token.UserPrincipal;
 import com.noplanb.global.payload.ApiResponse;
 import com.noplanb.global.payload.Message;
+import com.noplanb.global.payload.exception.CharacterNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +46,7 @@ public class CharacterService {
     private final ItemImageRepository itemImageRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final QuestRepository questRepository;
 
     // 캐릭터 보여주기 메소드
     public MyCharaterListRes getMyCharacterDetail(UserPrincipal userPrincipal) {
@@ -237,6 +243,25 @@ public class CharacterService {
         ApiResponse apiResponse = ApiResponse.builder()
                 .check(true)
                 .information(Message.builder().message("아이템 장착이 완료되었습니다.").build())
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+    @Transactional
+    public ResponseEntity<?> initCharacter(UserPrincipal userPrincipal) {
+        Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+        // 경험치, 레벨 초기화
+        character.initCharacter();
+
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+
+        // 오늘 만든 퀘스트들 지우기
+        questRepository.deleteByCharacterIdAndCreatedTimeBetween(character.getId(), startOfDay, endOfDay);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(Message.builder().message("초기화 완료").build())
                 .build();
 
         return ResponseEntity.ok(apiResponse);

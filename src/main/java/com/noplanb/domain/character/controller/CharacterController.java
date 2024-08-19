@@ -93,5 +93,9 @@ public class CharacterController {
     public ResponseEntity<?> equipItem(@Parameter @CurrentUser UserPrincipal userPrincipal, @RequestParam MyCharacterEquipItemReq myCharacterEquipItemReq){
         return characterService.myCharacterEquipItem(userPrincipal, myCharacterEquipItemReq);
     }
-
+    @PostMapping("/init")
+    @Operation(summary = "초기화 API", description = "레벨,경험치,퀘스트 초기화 API")
+    public ResponseEntity<?> initCharacter(@Parameter @CurrentUser UserPrincipal userPrincipal){
+        return characterService.initCharacter(userPrincipal);
+    }
 }
