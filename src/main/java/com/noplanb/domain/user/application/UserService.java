@@ -4,6 +4,7 @@ import com.noplanb.domain.auth.domain.Token;
 import com.noplanb.domain.auth.repository.TokenRepository;
 import com.noplanb.domain.character.domain.Character;
 import com.noplanb.domain.character.repository.CharacterRepository;
+import com.noplanb.domain.quest.repository.DailyExperienceRepository;
 import com.noplanb.domain.user.domain.User;
 import com.noplanb.domain.user.dto.response.MyAccountRes;
 import com.noplanb.domain.user.dto.response.UserCharacterExistRes;
@@ -26,6 +27,7 @@ public class UserService {
     private final TokenRepository tokenRepository;
     private final UserRepository userRepository;
     private final CharacterRepository characterRepository;
+    private final DailyExperienceRepository dailyExperienceRepository;
 
     @Transactional
     public void saveUser(User user) {
@@ -78,6 +80,9 @@ public class UserService {
 
         // 유저 정보 삭제
         userRepository.delete(user);
+
+        // Daily Experience 정보 삭제
+        dailyExperienceRepository.deleteByUser(user);
 
         ApiResponse apiResponse = ApiResponse.builder()
                 .check(true)
