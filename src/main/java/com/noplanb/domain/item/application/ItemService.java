@@ -66,7 +66,7 @@ public class ItemService {
             case "fashion":
                 // item_type이 HEAD, GLASSES, CLOTHES인 item만 필터링
                 itemList = items.stream()
-                        .filter(item -> item.getItemImage().getItemType().equals(HEAD) || item.getItemImage().getItemType().equals(GLASSES) || item.getItemImage().getItemType().equals(CLOTHES))
+                        .filter(item -> item.getItemImage().getItemType().equals(HEAD) || item.getItemImage().getItemType().equals(GLASSES) || item.getItemImage().getItemType().equals(CLOTHES) || item.getItemImage().getItemType().equals(ETC))
                         .toList();
                 break;
 
