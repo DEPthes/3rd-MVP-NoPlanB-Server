@@ -18,7 +18,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -47,5 +49,17 @@ public class UserController {
     @GetMapping("/character-exist")
     public ResponseEntity<?> getUserCharacterExist(@Parameter @CurrentUser UserPrincipal userPrincipal){
         return userService.getUserCharacterExist(userPrincipal);
+    }
+
+    @Operation(summary = "회원 탈퇴 API", description = "회원 탈퇴 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "탈퇴 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Message.class) ) } ),
+            @ApiResponse(responseCode = "400", description = "탈퇴 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
+    })
+    @DeleteMapping("/user")
+    public ResponseEntity<?> cancelAccount(@Parameter @CurrentUser UserPrincipal userPrincipal) {
+        {
+            return userService.cancelAccount(userPrincipal);
+        }
     }
 }

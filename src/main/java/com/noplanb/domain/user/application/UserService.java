@@ -1,5 +1,7 @@
 package com.noplanb.domain.user.application;
 
+import com.noplanb.domain.auth.domain.Token;
+import com.noplanb.domain.auth.repository.TokenRepository;
 import com.noplanb.domain.character.domain.Character;
 import com.noplanb.domain.character.repository.CharacterRepository;
 import com.noplanb.domain.user.domain.User;
@@ -21,7 +23,8 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class UserService {
 
-    final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
+    private final UserRepository userRepository;
     private final CharacterRepository characterRepository;
 
     @Transactional
@@ -61,4 +64,26 @@ public class UserService {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @Transactional
+    public ResponseEntity<?> cancelAccount(UserPrincipal userPrincipal) {
+        User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        String email = user.getEmail();
+
+        // 토큰 정보 삭제
+        Token token = tokenRepository.findByEmail(email);
+        if (token != null) { tokenRepository.delete(token); }
+
+        // 캐릭터 정보 삭제
+        characterRepository.deleteByUser(user);
+
+        // 유저 정보 삭제
+        userRepository.delete(user);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information("회원 탈퇴가 완료되었습니다.")
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
 }
