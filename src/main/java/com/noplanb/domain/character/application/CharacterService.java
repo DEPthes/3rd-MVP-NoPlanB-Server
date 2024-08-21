@@ -179,7 +179,7 @@ public class CharacterService {
         itemRepository.saveAll(itemList);
 
         // 기본 아이템 장착 (요청값에 따라 다르게 설정)
-        // 피부색(1~3) / 눈(4~6) / 머리(7~9) / 옷(10~11) 순서
+        // 피부색(1~3) / 눈(4~6) / 머리(7~9) / 옷(11~12) 순서
         // 장착할 아이템 ID = 아이템 이미지의 ID
 
         for (Long equippedItemId : newCharacterReq.getItemIdList()) {
