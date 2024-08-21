@@ -56,7 +56,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "탈퇴 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Message.class) ) } ),
             @ApiResponse(responseCode = "400", description = "탈퇴 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
     })
-    @DeleteMapping("/user")
+    @DeleteMapping("/")
     public ResponseEntity<?> cancelAccount(@Parameter @CurrentUser UserPrincipal userPrincipal) {
         {
             return userService.cancelAccount(userPrincipal);
