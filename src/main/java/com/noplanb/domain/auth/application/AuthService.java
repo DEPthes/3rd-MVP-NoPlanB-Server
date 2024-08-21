@@ -7,12 +7,14 @@ import com.noplanb.domain.user.domain.Provider;
 import com.noplanb.domain.user.domain.Role;
 import com.noplanb.domain.user.domain.User;
 import com.noplanb.domain.user.repository.UserRepository;
+import com.noplanb.global.config.security.token.UserPrincipal;
 import com.noplanb.global.config.security.util.JwtTokenUtil;
 import com.noplanb.global.payload.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Optional;
@@ -20,6 +22,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AuthService {
 
     private final IdTokenVerifier idTokenVerifier;
@@ -76,5 +79,23 @@ public class AuthService {
         } else {
             throw new RuntimeException("유효하지 않은 ID 토큰");
         }
+    }
+
+    public ResponseEntity<?> logout(UserPrincipal userPrincipal) {
+        User user = (User) userDetailsService.loadUserByUsername(userPrincipal.getUsername());
+        String email = user.getEmail();
+
+        // 토큰 정보 삭제
+        Token token = tokenRepository.findByEmail(email);
+        if (token != null) {
+            tokenRepository.delete(token);
+        }
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information("로그아웃 성공")
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
     }
 }
