@@ -10,5 +10,5 @@ import java.util.List;
 public interface DailyExperienceRepository extends JpaRepository<DailyExperience, Long> {
     List<DailyExperience> findByCharacterIdAndDateBetweenOrderByDateAsc(Long characterId, LocalDate startDate, LocalDate endDate);
 
-    void deleteByUser(User user);
+    void deleteAllByCharacterId(Long characterId);
 }

@@ -4,6 +4,7 @@ import com.noplanb.domain.auth.domain.Token;
 import com.noplanb.domain.auth.repository.TokenRepository;
 import com.noplanb.domain.character.domain.Character;
 import com.noplanb.domain.character.repository.CharacterRepository;
+import com.noplanb.domain.quest.domain.DailyExperience;
 import com.noplanb.domain.quest.repository.DailyExperienceRepository;
 import com.noplanb.domain.user.domain.User;
 import com.noplanb.domain.user.dto.response.MyAccountRes;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -82,8 +84,11 @@ public class UserService {
         userRepository.delete(user);
 
         // Daily Experience 정보 삭제
-        dailyExperienceRepository.deleteByUser(user);
+        Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+        Long characterId = character.getId();
+        dailyExperienceRepository.deleteAllByCharacterId(characterId);
 
+        // 응답 생성 및 반환
         ApiResponse apiResponse = ApiResponse.builder()
                 .check(true)
                 .information("회원 탈퇴가 완료되었습니다.")
