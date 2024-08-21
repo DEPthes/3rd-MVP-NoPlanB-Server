@@ -30,16 +30,15 @@ public class Character extends BaseEntity {
     private Long todayExp;
     private Long level;
 
-//    @OneToOne(mappedBy = "character", fetch = FetchType.LAZY)
-//    private User user;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", unique = true)
     private User user;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "character", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "character", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Quest> quests = new ArrayList<>();
-    @OneToMany(mappedBy = "character")
+
+    @OneToMany(mappedBy = "character", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items = new ArrayList<>();
 
 

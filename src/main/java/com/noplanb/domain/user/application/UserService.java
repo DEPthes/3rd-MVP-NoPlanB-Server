@@ -61,4 +61,18 @@ public class UserService {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @Transactional
+    public ResponseEntity<?> cancelAccount(UserPrincipal userPrincipal) {
+        User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        characterRepository.deleteByUser(user);
+        userRepository.delete(user);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information("회원 탈퇴가 완료되었습니다.")
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
 }
