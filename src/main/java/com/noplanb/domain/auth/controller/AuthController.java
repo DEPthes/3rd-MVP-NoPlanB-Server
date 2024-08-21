@@ -4,9 +4,13 @@ import com.noplanb.domain.auth.application.AuthService;
 import com.noplanb.domain.auth.dto.request.SigninReq;
 import com.noplanb.domain.auth.dto.response.LoginResponse;
 import com.noplanb.domain.character.dto.response.MyCharaterListRes;
+import com.noplanb.global.config.security.token.CurrentUser;
+import com.noplanb.global.config.security.token.UserPrincipal;
 import com.noplanb.global.payload.ErrorCode;
 import com.noplanb.global.payload.ErrorResponse;
+import com.noplanb.global.payload.Message;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -50,4 +54,15 @@ public class AuthController {
             return ResponseEntity.badRequest().body(errorResponse);
         }
     }
+
+    @Operation(summary = "로그아웃 API", description = "로그아웃 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "로그아웃 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Message.class) ) } ),
+            @ApiResponse(responseCode = "400", description = "로그아웃 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
+    })
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@Parameter @CurrentUser UserPrincipal userPrincipal) {
+        return authService.logout(userPrincipal);
+    }
+
 }
