@@ -70,7 +70,10 @@ public class UserService {
 
     @Transactional
     public ResponseEntity<?> cancelAccount(UserPrincipal userPrincipal) {
+
         User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        Character character = characterRepository.findByUserId(user.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        Long characterId = character.getId();
         String email = user.getEmail();
 
         // 토큰 정보 삭제
@@ -84,9 +87,7 @@ public class UserService {
         userRepository.delete(user);
 
         // Daily Experience 정보 삭제
-//        Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
-//        Long characterId = character.getId();
-//        dailyExperienceRepository.deleteAllByCharacterId(characterId);
+        dailyExperienceRepository.deleteAllByCharacterId(characterId);
 
         // 응답 생성 및 반환
         ApiResponse apiResponse = ApiResponse.builder()
