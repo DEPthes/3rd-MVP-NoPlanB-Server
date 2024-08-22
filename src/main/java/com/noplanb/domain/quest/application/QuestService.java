@@ -187,6 +187,8 @@ public class QuestService {
         Quest quest = quests.stream().filter(q -> q.getId().equals(id))
                 .findFirst()
                 .orElseThrow(QuestNotFoundException::new);
+        System.out.println("quest.getContents() = " + quest.getContents());
+        quests.remove(quest);
         questRepository.delete(quest);
 
         return createApiResponse(Message.builder().message("퀘스트를 삭제했습니다.").build());
