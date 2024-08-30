@@ -38,16 +38,10 @@ public class ItemController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "얼굴 아이템 목록 조회 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
     })
-    @GetMapping("/cache/face/{userId}")
-    public ResponseEntity<?> getcacheFaceItemList(@Parameter(description = "Access Token을 입력해주세요.", required = true) @PathVariable Long userId){
-        return ResponseEntity.ok(createApiResponse(itemService.getcacheFaceItemList(userId)));
+    @GetMapping("/face/{userId}")
+    public ResponseEntity<?> getFaceItemList(@Parameter(description = "Access Token을 입력해주세요.", required = true) @PathVariable Long userId){
+        return ResponseEntity.ok(createApiResponse(itemService.getFaceItemList(userId)));
     }
-    @GetMapping("/nocache/face/{userId}")
-    public ResponseEntity<?> getnocacheFaceItemList(@Parameter(description = "Access Token을 입력해주세요.", required = true) @PathVariable Long userId){
-        return ResponseEntity.ok(createApiResponse(itemService.getnocacheFaceItemList(userId)));
-    }
-
-
 
     @Operation(summary = "패션 카테고리 아이템 조회 API", description = "패션 카테고리에 해당하는 아이템 목록을 조회하는 API입니다.")
     @ApiResponses(value = {
