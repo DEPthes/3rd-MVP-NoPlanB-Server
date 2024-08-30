@@ -21,6 +21,9 @@ import com.noplanb.global.payload.exception.CharacterNotFoundException;
 import com.noplanb.global.payload.exception.QuestNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -61,8 +64,8 @@ public class QuestService {
 
         return createApiResponse((Message.builder().message("퀘스트를 만들었습니다.").build()));
     }
-    public ResponseEntity<?> retrieveQuest(LocalDate localDate, UserPrincipal userPrincipal) {
-        Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
+    public List <RetrieveQuestRes> cacheretrieveQuest(LocalDate localDate, Long userId) {
+        Character character = characterRepository.findByUserId(userId).orElseThrow(CharacterNotFoundException::new);
         List<Quest> quests = character.getQuests();
         // 특정 날짜에 해당하는 퀘스트 필터링 후 미완료 완료 로 정렬 후 생성순으로 정렬
         List<RetrieveQuestRes> retrieveQuestResList = quests.stream()
@@ -76,8 +79,24 @@ public class QuestService {
                         .isComplete(quest.getIsComplete())
                         .build())
                 .collect(Collectors.toList());
-
-        return createApiResponse(retrieveQuestResList);
+        return retrieveQuestResList;
+    }
+    public List <RetrieveQuestRes> nocacheretrieveQuest(LocalDate localDate, Long userId) {
+        Character character = characterRepository.findByUserId(userId).orElseThrow(CharacterNotFoundException::new);
+        List<Quest> quests = character.getQuests();
+        // 특정 날짜에 해당하는 퀘스트 필터링 후 미완료 완료 로 정렬 후 생성순으로 정렬
+        List<RetrieveQuestRes> retrieveQuestResList = quests.stream()
+                .filter(quest -> quest.getCreatedTime().toLocalDate().isEqual(localDate))
+                .sorted(Comparator.comparing(Quest::getIsComplete)
+                        .thenComparing(Quest::getCreatedTime))
+                .map(quest -> RetrieveQuestRes.builder()
+                        .id(quest.getId())
+                        .contents(quest.getContents())
+                        .exp(quest.getExp())
+                        .isComplete(quest.getIsComplete())
+                        .build())
+                .collect(Collectors.toList());
+        return retrieveQuestResList;
     }
 
     public ResponseEntity<?> retrieveLevelAndTodayExp(UserPrincipal userPrincipal) {
@@ -113,6 +132,12 @@ public class QuestService {
         return createApiResponse(retrieveLevelAndTodayExpRes);
     }
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "item-cache", key = "'hair:' + #userId"),
+            @CacheEvict(value = "item-cache", key = "'face:' + #userId"),
+            @CacheEvict(value = "item-cache", key = "'fashion:' + #userId"),
+            @CacheEvict(value = "item-cache", key = "'background:' + #userId")
+    })
     public ResponseEntity<?> completeQuest(UserPrincipal userPrincipal, Long id) {
         Character character = characterRepository.findByUserId(userPrincipal.getId()).orElseThrow(CharacterNotFoundException::new);
         Long characterLevel = character.getLevel();
