@@ -1,9 +1,6 @@
 package com.noplanb.domain.item.controller;
 
-import com.noplanb.domain.item.dto.response.CategoryItemListRes;
 import com.noplanb.domain.item.application.ItemService;
-import com.noplanb.global.config.security.token.CurrentUser;
-import com.noplanb.global.config.security.token.UserPrincipal;
 import com.noplanb.global.payload.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -28,45 +26,46 @@ public class ItemController {
 
     @Operation(summary = "헤어 카테고리 아이템 조회 API", description = "헤어 카테고리에 해당하는 아이템 목록을 조회하는 API입니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "헤어 아이템 목록 조회 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryItemListRes.class) ) } ),
             @ApiResponse(responseCode = "400", description = "헤어 아이템 목록 조회 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
     })
-    @GetMapping("/hair")
-    public ResponseEntity<?> getHairItemList(@Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal){
-        return itemService.getHairItemList(userPrincipal);
+    @GetMapping("/hair/{userId}")
+    public ResponseEntity<?> getHairItemList(@Parameter(description = "Access Token을 입력해주세요.", required = true) @PathVariable Long userId){
+        return ResponseEntity.ok(createApiResponse(itemService.getHairItemList(userId)));
     }
 
 
     @Operation(summary = "얼굴 카테고리 아이템 조회 API", description = "얼굴 카테고리에 해당하는 아이템 목록을 조회하는 API입니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "얼굴 아이템 목록 조회 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryItemListRes.class) ) } ),
             @ApiResponse(responseCode = "400", description = "얼굴 아이템 목록 조회 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
     })
-    @GetMapping("/face")
-    public ResponseEntity<?> getFaceItemList(@Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal){
-        return itemService.getFaceItemList(userPrincipal);
+    @GetMapping("/face/{userId}")
+    public ResponseEntity<?> getFaceItemList(@Parameter(description = "Access Token을 입력해주세요.", required = true) @PathVariable Long userId){
+        return ResponseEntity.ok(createApiResponse(itemService.getFaceItemList(userId)));
     }
-
-
 
     @Operation(summary = "패션 카테고리 아이템 조회 API", description = "패션 카테고리에 해당하는 아이템 목록을 조회하는 API입니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "패션 아이템 목록 조회 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryItemListRes.class) ) } ),
             @ApiResponse(responseCode = "400", description = "패션 아이템 목록 조회 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
     })
-    @GetMapping("/fashion")
-    public ResponseEntity<?> getFashionItemList(@Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal){
-        return itemService.getFashionItemList(userPrincipal);
+    @GetMapping("/fashion/{userId}")
+    public ResponseEntity<?> getFashionItemList(@Parameter(description = "Access Token을 입력해주세요.", required = true) @PathVariable Long userId){
+        return ResponseEntity.ok(createApiResponse(itemService.getFashionItemList(userId)));
     }
 
     @Operation(summary = "배경 카테고리 아이템 조회 API", description = "배경 카테고리에 해당하는 아이템 목록을 조회하는 API입니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "배경 아이템 목록 조회 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryItemListRes.class) ) } ),
             @ApiResponse(responseCode = "400", description = "배경 아이템 목록 조회 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
     })
-    @GetMapping("/background")
-    public ResponseEntity<?> getBackgroundItemList(@Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal){
-        return itemService.getBackgroundItemList(userPrincipal);
+    @GetMapping("/background/{userId}")
+    public ResponseEntity<?> getBackgroundItemList(@Parameter(description = "Access Token을 입력해주세요.", required = true) @PathVariable Long userId){
+        return ResponseEntity.ok(createApiResponse(itemService.getBackgroundItemList(userId)));
+    }
+    private <T> ResponseEntity<com.noplanb.global.payload.ApiResponse> createApiResponse(T information) {
+        com.noplanb.global.payload.ApiResponse apiResponse = com.noplanb.global.payload.ApiResponse.builder()
+                .check(true)
+                .information(information)
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
 }
