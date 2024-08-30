@@ -45,16 +45,27 @@ public class QuestController {
 
         return questService.createQuest(createQuestReq, userPrincipal);
     }
-    @GetMapping("/{date}")
+    @GetMapping("/cache/{date}/{userId}")
     @Operation(summary = "퀘스트조회", description = "퀘스트를 조회할 때 사용하는 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "퀘스트 조회 성공", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RetrieveQuestRes.class))}),
             @ApiResponse(responseCode = "400", description = "퀘스트 조회 실패", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
-    public ResponseEntity<?> retrieveQuest(
+    public ResponseEntity<?> yesretrieveQuest(
             @Parameter(example = "2024-08-09", description = "날짜를 입력해주세요", required = true) @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal){
-        return questService.retrieveQuest(date,userPrincipal);
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @PathVariable Long userId){
+        return ResponseEntity.ok(createApiResponse(questService.cacheretrieveQuest(date,userId)));
+    }
+    @GetMapping("/nocache/{date}/{userId}")
+    @Operation(summary = "퀘스트조회", description = "퀘스트를 조회할 때 사용하는 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "퀘스트 조회 성공", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RetrieveQuestRes.class))}),
+            @ApiResponse(responseCode = "400", description = "퀘스트 조회 실패", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    public ResponseEntity<?> noretrieveQuest(
+            @Parameter(example = "2024-08-09", description = "날짜를 입력해주세요", required = true) @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @PathVariable Long userId){
+        return ResponseEntity.ok(createApiResponse(questService.nocacheretrieveQuest(date,userId)));
     }
     @GetMapping
     @Operation(summary = "메인페이지 상당부분", description = "메인페이지 상당부부을 조회할 떄 사용하는 API")
@@ -63,7 +74,7 @@ public class QuestController {
             @ApiResponse(responseCode = "400", description = "메인페이지 상당부분 조회 실패", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     public ResponseEntity<?> retrieveLevelAndTodayExp(
-        @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal){
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal){
         return questService.retrieveLevelAndTodayExp(userPrincipal);
     }
     @PostMapping("/{id}")
@@ -96,9 +107,17 @@ public class QuestController {
             @ApiResponse(responseCode = "400", description = "퀘스트 삭제 실패", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     public ResponseEntity<?> deleteQuest(
-            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
+            @Parameter(description = "Access Token을 입력해주세요.", required = true)  UserPrincipal userPrincipal,
             @Parameter(description = "삭제할 퀘스트 아이디를 입력해주세요.", required = true) @PathVariable Long id){
         return questService.deleteQuest(userPrincipal,id);
+    }
+
+    private <T> ResponseEntity<com.noplanb.global.payload.ApiResponse> createApiResponse(T information) {
+        com.noplanb.global.payload.ApiResponse apiResponse = com.noplanb.global.payload.ApiResponse.builder()
+                .check(true)
+                .information(information)
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
 }
