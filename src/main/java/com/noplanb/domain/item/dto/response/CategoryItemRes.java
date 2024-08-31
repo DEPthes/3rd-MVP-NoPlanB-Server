@@ -1,6 +1,7 @@
 package com.noplanb.domain.item.dto.response;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.noplanb.domain.item_image.domain.ItemType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,7 @@ public class CategoryItemRes {
     private boolean ableToEquip;
 
     @Schema(type = "boolean", example = "false", description = "장착 여부")
+    @JsonProperty("equipped")
     private boolean isEquipped;
 
     @Schema(type = "Long", example = "20", description = "필요 레벨")
